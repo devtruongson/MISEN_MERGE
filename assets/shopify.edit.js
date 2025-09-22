@@ -715,6 +715,10 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
     const [generatedImages, setGeneratedImages] = useState([]);
     const [error, setError] = useState('');
 
+    // State cho lightbox
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     // Cập nhật prompt dựa trên formData khi thay đổi
     useEffect(() => {
         const generatePrompt = () => {
@@ -809,7 +813,10 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
 
             const response = await fetch(config.apiEndpoint, {
                 ...config.requestConfig,
-                body: JSON.stringify(dataSend),
+                body: JSON.stringify({
+                    data: dataSend,
+                    token: localStorage.getItem("shopify_misen_login"),
+                }),
             });
 
             if (!response.ok) {
@@ -845,6 +852,46 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
         onSelectImage(imageUrl);
         onClose();
     };
+
+    // Lightbox functions
+    const openLightbox = (index) => {
+        setCurrentImageIndex(index);
+        setLightboxOpen(true);
+    };
+
+    const closeLightbox = () => {
+        setLightboxOpen(false);
+    };
+
+    const nextImage = () => {
+        setCurrentImageIndex((prev) => (prev + 1) % generatedImages.length);
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) => (prev - 1 + generatedImages.length) % generatedImages.length);
+    };
+
+    // Handle keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!lightboxOpen) return;
+
+            switch (e.key) {
+                case 'Escape':
+                    closeLightbox();
+                    break;
+                case 'ArrowLeft':
+                    prevImage();
+                    break;
+                case 'ArrowRight':
+                    nextImage();
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [lightboxOpen]);
 
     console.log("check re-render")
 
@@ -1210,14 +1257,33 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
                                                         src={image.url}
                                                         alt={`Generated image ${index + 1}`}
                                                         className="w-full h-48 object-cover cursor-pointer hover:scale-105 transition-transform"
-                                                        onClick={() => selectImage(image.url)}
+                                                        onClick={() => openLightbox(index)}
                                                     />
-                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300"></div>
+                                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity">
                                                         <button
-                                                            onClick={() => selectImage(image.url)}
-                                                            className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 font-medium transition-colors"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openLightbox(index);
+                                                            }}
+                                                            className="px-3 py-2 bg-white/90 text-gray-900 rounded-lg hover:bg-white font-medium transition-colors text-sm flex items-center gap-1"
                                                         >
-                                                            Select This Image
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                                            </svg>
+                                                            Preview
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                selectImage(image.url);
+                                                            }}
+                                                            className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm flex items-center gap-1"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            Select
                                                         </button>
                                                     </div>
                                                 </div>
@@ -1227,10 +1293,6 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
                                                             <svg className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                             </svg>
-                                                            <div className="flex-1">
-                                                                <h5 className="text-xs font-semibold text-gray-700 mb-1">Revised Prompt:</h5>
-                                                                <p className="text-xs text-gray-600 leading-relaxed">{image.revised_prompt}</p>
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 )}
@@ -1249,6 +1311,102 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
                         </div>
                     </div>
                 </div>
+
+                {/* Lightbox */}
+                {lightboxOpen && generatedImages.length > 0 && (
+                    <div className="fixed inset-0 bg-black/95 z-[10000] flex items-center justify-center p-4">
+                        {/* Close Button */}
+                        <button
+                            onClick={closeLightbox}
+                            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+                        >
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        {/* Navigation Buttons */}
+                        {generatedImages.length > 1 && (
+                            <>
+                                <button
+                                    onClick={prevImage}
+                                    className="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+                                >
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <button
+                                    onClick={nextImage}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+                                >
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </>
+                        )}
+
+                        {/* Image Container */}
+                        <div className="max-w-5xl max-h-full flex flex-col items-center">
+                            <img
+                                src={generatedImages[currentImageIndex]?.url}
+                                alt={`Generated image ${currentImageIndex + 1}`}
+                                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-2xl"
+                            />
+
+                            {/* Image Info */}
+                            <div className="mt-6 max-w-2xl text-center">
+                                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                                    <div className="flex items-center justify-center gap-4 mb-4">
+                                        <span className="text-white/70 text-sm">
+                                            {currentImageIndex + 1} of {generatedImages.length}
+                                        </span>
+                                        <button
+                                            onClick={() => selectImage(generatedImages[currentImageIndex]?.url)}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm flex items-center gap-2"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Select This Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Thumbnail Strip */}
+                        {generatedImages.length > 1 && (
+                            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                                <div className="flex gap-2 p-2 bg-white/10 backdrop-blur-sm rounded-lg">
+                                    {generatedImages.map((image, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentImageIndex(index)}
+                                            className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${index === currentImageIndex
+                                                ? 'border-blue-400 ring-2 ring-blue-400/50'
+                                                : 'border-white/30 hover:border-white/60'
+                                                }`}
+                                        >
+                                            <img
+                                                src={image.url}
+                                                alt={`Thumbnail ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Click outside to close */}
+                        <div
+                            className="absolute inset-0 -z-10"
+                            onClick={closeLightbox}
+                        ></div>
+                    </div>
+                )}
             </div>
         </div>
     );

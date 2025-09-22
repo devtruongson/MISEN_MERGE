@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "pf-45df010d": {
+      "type": "pf-45df010d",
+      "settings": {}
+    }
+  },
+  "order": [
+    "pf-45df010d"
+  ],
+  "layout": "theme.pagefly"
+}

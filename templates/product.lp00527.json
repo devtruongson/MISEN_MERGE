@@ -1,0 +1,9 @@
+{
+    "sections": {
+        "main": {
+            "type": "product-lp00527",
+            "settings": {}
+        }
+    },
+    "order": ["main"]
+}

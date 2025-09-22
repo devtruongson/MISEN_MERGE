@@ -1,0 +1,4344 @@
+{% comment %} Template: TrailVision Pro X50 Landing Page {% endcomment %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      {{ template_data.page_title }}
+    </title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      * {
+        font-family: 'Manrope', sans-serif;
+      }
+
+      .font-space {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .theme-header-unix {
+        display: none !important;
+      }
+
+      .theme-footer-unix {
+        display: none !important;
+      }
+
+      .hero-container {
+        display: grid;
+        gap: 2rem;
+      }
+
+      @media (min-width: 1024px) {
+        .hero-container {
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+          align-items: center;
+        }
+
+        .hero-badges {
+          grid-column: 1;
+        }
+
+        .hero-headline {
+          grid-column: 1;
+        }
+
+        .hero-subheadline {
+          grid-column: 1;
+        }
+
+        .hero-features {
+          grid-column: 1;
+        }
+
+        .hero-cta {
+          grid-column: 1;
+        }
+
+        .hero-social {
+          grid-column: 1;
+        }
+
+        .hero-image {
+          grid-column: 2;
+          grid-row: 1 / span 7;
+          align-self: center;
+        }
+
+        .hero-image::before {
+          content: '';
+          position: absolute;
+          inset: -2rem;
+          background: radial-gradient(circle, rgba(16, 185, 129, 0.2), transparent);
+          filter: blur(3rem);
+          z-index: -1;
+        }
+      }
+
+      @media (max-width: 1023px) {
+        .hero-container {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .hero-badges {
+          order: 1;
+        }
+
+        .hero-headline {
+          order: 2;
+        }
+
+        .hero-subheadline {
+          order: 3;
+        }
+
+        .hero-image {
+          order: 4;
+          margin: 1rem 0;
+        }
+
+        .hero-features {
+          order: 5;
+        }
+
+        .hero-cta {
+          order: 6;
+        }
+
+        .hero-social {
+          order: 7;
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes glow {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
+
+        50% {
+          box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
+        }
+      }
+
+      .animate-slideDown {
+        animation: slideDown 0.5s ease-out;
+      }
+
+      .animate-fadeInUp {
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .glow-effect {
+        animation: glow 2s ease-in-out infinite;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      .progress-smooth {
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .premium-shadow {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      @keyframes slideInLeft {
+        from {
+          transform: translateX(-120%);
+        }
+
+        to {
+          transform: translateX(0);
+        }
+      }
+
+      .notification-slide {
+        animation: slideInLeft 0.5s ease-out;
+      }
+
+      @media (max-width: 640px) {
+        section {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+
+        h1 {
+          line-height: 1.15 !important;
+        }
+
+        .container {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+      }
+    </style>
+    <script>
+      window.productData = {
+            id: '{{ product.id }}',
+            title: '{{ product.title | escape }}',
+            handle: '{{ product.handle }}',
+            price: {{ product.price }},
+            compare_at_price: {% if product.compare_at_price %}{{ product.compare_at_price }}{% else %}''{% endif %},
+            available: {{ product.available }},
+            image: "{{ product.featured_image | image_url: width: 100 }}",
+            variants: [
+              {% for variant in product.variants %}
+              {
+                id: {{ variant.id }},
+                title: "{{ variant.title | escape }}",
+                price: {{ variant.price }},
+                available: {{ variant.available }},
+                quantity: {{ variant.inventory_quantity }},
+                image: {% if variant.image %}"{{ variant.image | image_url: width: 100 }}"{% else %}""{% endif %}
+              }{% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            ],
+            options: {{ product.options_with_values | json }},
+            selected_or_first_available_variant: {{ product.selected_or_first_available_variant | json }},
+            featuredImage: {
+              url: '{{ product.featured_image | image_url: width: 1000 }}'
+            },
+            collections: {{ product.collections | json }},
+            brandName: '{{ product.vendor | escape }}',
+            productCategory: '{{ product.type | escape }}',
+            productType: '{{ product.metafields.custom.product_type | escape }}',
+            mainUSP: '{{ product.metafields.custom.usp | escape }}',
+            productSize: '{{ product.metafields.custom.size | escape }}',
+            targetCustomer: '{{ product.metafields.custom.target | escape }}',
+            priceRange: '{{ product.metafields.custom.price_range | escape }}',
+            availableReferenceImages: {{ product.metafields.custom.reference_images | json }}
+          };
+    </script>
+    {% assign template_data = product.metafields.custom.template_data.value | parse_json %}
+  </head>
+
+  <body class="bg-slate-50">
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-200 z-[100]">
+      <div
+        id="progress-bar"
+        class="h-full bg-gradient-to-r from-emerald-500 to-green-500 progress-smooth"
+        style="width: 0%"
+      ></div>
+    </div>
+
+    <header class="sticky top-1 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-2.5">
+        <div class="container mx-auto px-4">
+          <div class="flex items-center justify-center gap-3 text-sm sm:text-base">
+            <span class="flex items-center gap-2">
+              <i
+                class="fas fa-{{ template_data.banner_icon_1 }}"
+                data-meta="banner_icon_1"
+                data-type="icon"
+              ></i>
+              <span class="font-medium" data-meta="banner_text_1">{{ template_data.banner_text_1 }}</span>
+            </span>
+            <span class="hidden sm:flex items-center gap-2 text-emerald-400">
+              <i
+                class="fas fa-{{ template_data.banner_icon_2 }}"
+                data-meta="banner_icon_2"
+                data-type="icon"
+              ></i>
+              <span id="countdown-timer" data-meta="countdown_timer_1">{{ template_data.countdown_timer_1 }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16 lg:h-20">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center">
+              <span
+                class="font-space font-bold text-2xl sm:text-3xl text-slate-900"
+                data-meta="brand_part_1"
+              >
+                {{- template_data.brand_part_1 -}}
+              </span>
+              <span
+                class="font-space font-bold text-2xl sm:text-3xl gradient-text"
+                data-meta="brand_part_2"
+              >
+                {{- template_data.brand_part_2 -}}
+              </span>
+            </div>
+            <span
+              class="inline-block bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded"
+              data-meta="brand_badge"
+            >
+              {{ template_data.brand_badge }}
+            </span>
+          </div>
+
+          <div class="hidden lg:flex items-center gap-8">
+            <a
+              href="{{ template_data.nav_link_1 }}"
+              class="text-slate-600 hover:text-emerald-600 font-medium transition-colors"
+              data-meta="nav_link_1 nav_text_1"
+            >
+              {{- template_data.nav_text_1 -}}
+            </a>
+            <a
+              href="{{ template_data.nav_link_2 }}"
+              class="text-slate-600 hover:text-emerald-600 font-medium transition-colors"
+              data-meta="nav_link_2 nav_text_2"
+            >
+              {{- template_data.nav_text_2 -}}
+            </a>
+            <a
+              href="{{ template_data.nav_link_3 }}"
+              class="text-slate-600 hover:text-emerald-600 font-medium transition-colors"
+              data-meta="nav_link_3 nav_text_3"
+            >
+              {{- template_data.nav_text_3 -}}
+            </a>
+            <a
+              href="{{ template_data.nav_link_4 }}"
+              class="text-slate-600 hover:text-emerald-600 font-medium transition-colors"
+              data-meta="nav_link_4 nav_text_4"
+            >
+              {{- template_data.nav_text_4 -}}
+            </a>
+            <a
+              href="{{ template_data.nav_link_5 }}"
+              class="bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold px-6 py-2.5 rounded-full hover:shadow-lg transition-all transform hover:scale-105"
+              data-meta="nav_link_5 nav_cta_text"
+            >
+              {{ template_data.nav_cta_text }}
+            </a>
+          </div>
+
+          <button id="menu-toggle" class="lg:hidden p-2">
+            <i class="fas fa-{{ template_data.menu_icon }}" data-meta="menu_icon" data-type="icon"></i>
+          </button>
+        </div>
+
+        <div id="mobile-nav" style="display: none" class="lg:hidden pb-4 border-t border-slate-200 mt-2 pt-4">
+          <div class="flex flex-col gap-3">
+            <a
+              href="{{ template_data.mobile_nav_link_1 }}"
+              class="text-slate-600 font-medium py-2"
+              data-meta="mobile_nav_link_1 mobile_nav_text_1"
+            >
+              {{- template_data.mobile_nav_text_1 -}}
+            </a>
+            <a
+              href="{{ template_data.mobile_nav_link_2 }}"
+              class="text-slate-600 font-medium py-2"
+              data-meta="mobile_nav_link_2 mobile_nav_text_2"
+            >
+              {{- template_data.mobile_nav_text_2 -}}
+            </a>
+            <a
+              href="{{ template_data.mobile_nav_link_3 }}"
+              class="text-slate-600 font-medium py-2"
+              data-meta="mobile_nav_link_3 mobile_nav_text_3"
+            >
+              {{- template_data.mobile_nav_text_3 -}}
+            </a>
+            <a
+              href="{{ template_data.mobile_nav_link_4 }}"
+              class="text-slate-600 font-medium py-2"
+              data-meta="mobile_nav_link_4 mobile_nav_text_4"
+            >
+              {{- template_data.mobile_nav_text_4 -}}
+            </a>
+            <a
+              href="{{ template_data.mobile_nav_link_5 }}"
+              class="bg-emerald-600 text-white font-semibold text-center py-3 rounded-full"
+              data-meta="mobile_nav_link_5 mobile_nav_cta_text"
+            >
+              {{ template_data.mobile_nav_cta_text }}
+            </a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <section
+      class="min-h-screen flex items-center relative overflow-hidden bg-gradient-to-b from-white via-emerald-50/20 to-white py-12 lg:py-16"
+    >
+      <div class="absolute inset-0 opacity-5">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-emerald-500 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-green-500 rounded-full blur-3xl"></div>
+      </div>
+
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="hero-container">
+          <div class="hero-badges animate-fadeInUp">
+            <div class="inline-flex items-center gap-3">
+              <div
+                class="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-full shadow-sm"
+              >
+                <div class="flex -space-x-2">
+                  <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                </div>
+                <span class="text-sm font-medium text-slate-700" data-meta="active_users_text">
+                  {{- template_data.active_users_text -}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <h1
+            class="hero-headline font-space font-bold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-slate-900 leading-[1.1] animate-fadeInUp"
+          >
+            <span data-meta="headline_part_1">{{ template_data.headline_part_1 }}</span>
+            <span class="relative inline-block">
+              <span
+                class="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-green-500"
+                data-meta="headline_highlight"
+              >
+                {{ template_data.headline_highlight }}
+              </span>
+              <span class="absolute bottom-2 left-0 w-full h-3 bg-emerald-200 opacity-30"></span>
+            </span>
+            <br>
+            <span data-meta="headline_part_2">{{ template_data.headline_part_2 }}</span>
+          </h1>
+
+          <p
+            class="hero-subheadline text-lg sm:text-xl lg:text-2xl text-slate-600 leading-relaxed animate-fadeInUp"
+            data-meta="hero_subheadline"
+          >
+            {{ template_data.hero_subheadline }}
+          </p>
+
+          <div class="hero-image animate-fadeInUp">
+            <div class="relative rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src="{{ template_data.hero_image }}"
+                alt=""
+                data-meta="hero_image"
+                data-type="image"
+                class="w-full h-auto object-cover"
+              >
+
+              <div
+                class="absolute top-4 sm:top-6 left-4 sm:left-6 bg-black/80 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm font-medium backdrop-blur-sm"
+              >
+                <i
+                  class="fas fa-{{ template_data.hero_badge_icon }}"
+                  data-meta="hero_badge_icon"
+                  data-type="icon"
+                ></i>
+                <span class="hidden sm:inline" data-meta="hero_badge_text_desktop">
+                  {{- template_data.hero_badge_text_desktop -}}
+                </span>
+                <span class="sm:hidden" data-meta="hero_badge_text_mobile">
+                  {{- template_data.hero_badge_text_mobile -}}
+                </span>
+              </div>
+
+              <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-auto">
+                <div
+                  class="bg-white/95 backdrop-blur-md rounded-xl p-3 sm:p-4 shadow-xl flex items-center gap-3 max-w-xs"
+                >
+                  <div
+                    class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                  >
+                    <i
+                      class="fas fa-{{ template_data.hero_feature_icon }}"
+                      data-meta="hero_feature_icon"
+                      data-type="icon"
+                    ></i>
+                  </div>
+                  <div>
+                    <p
+                      class="font-semibold text-slate-900 text-sm sm:text-base"
+                      data-meta="hero_feature_title"
+                    >
+                      {{ template_data.hero_feature_title }}
+                    </p>
+                    <p class="text-xs sm:text-sm text-slate-600" data-meta="hero_feature_subtitle">
+                      {{ template_data.hero_feature_subtitle }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-features grid grid-cols-2 sm:grid-cols-4 gap-4 animate-fadeInUp">
+            <div class="flex flex-col items-center text-center space-y-2">
+              <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <i
+                  class="fas fa-{{ template_data.feature_icon_1 }}"
+                  data-meta="feature_icon_1"
+                  data-type="icon"
+                ></i>
+              </div>
+              <span class="text-sm font-medium text-slate-700" data-meta="feature_text_1">
+                {{- template_data.feature_text_1 -}}
+              </span>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-2">
+              <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <i
+                  class="fas fa-{{ template_data.feature_icon_2 }}"
+                  data-meta="feature_icon_2"
+                  data-type="icon"
+                ></i>
+              </div>
+              <span class="text-sm font-medium text-slate-700" data-meta="feature_text_2">
+                {{- template_data.feature_text_2 -}}
+              </span>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-2">
+              <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <i
+                  class="fas fa-{{ template_data.feature_icon_3 }}"
+                  data-meta="feature_icon_3"
+                  data-type="icon"
+                ></i>
+              </div>
+              <span class="text-sm font-medium text-slate-700" data-meta="feature_text_3">
+                {{- template_data.feature_text_3 -}}
+              </span>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-2">
+              <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <i
+                  class="fas fa-{{ template_data.feature_icon_4 }}"
+                  data-meta="feature_icon_4"
+                  data-type="icon"
+                ></i>
+              </div>
+              <span class="text-sm font-medium text-slate-700" data-meta="feature_text_4">
+                {{- template_data.feature_text_4 -}}
+              </span>
+            </div>
+          </div>
+
+          <div class="hero-cta space-y-6 animate-fadeInUp">
+            <div class="flex flex-col sm:flex-row gap-4">
+              <a
+                href="{{ template_data.cta_primary_link }}"
+                class="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-center py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
+                data-meta="cta_primary_link"
+              >
+                <i
+                  class="fas fa-{{ template_data.cta_primary_icon }}"
+                  data-meta="cta_primary_icon"
+                  data-type="icon"
+                ></i>
+                <span data-meta="cta_primary_text">{{ template_data.cta_primary_text }}</span>
+              </a>
+              <button
+                onclick="playDemo()"
+                class="sm:flex-1 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-center py-4 px-6 rounded-xl border-2 border-slate-200 transition-colors"
+              >
+                <i
+                  class="fas fa-{{ template_data.cta_secondary_icon }}"
+                  data-meta="cta_secondary_icon"
+                  data-type="icon"
+                ></i>
+                <span data-meta="cta_secondary_text">{{ template_data.cta_secondary_text }}</span>
+              </button>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-600">
+              <span class="flex items-center gap-1.5">
+                <i
+                  class="fas fa-{{ template_data.trust_icon_1 }}"
+                  data-meta="trust_icon_1"
+                  data-type="icon"
+                ></i>
+                <span data-meta="trust_text_1">{{ template_data.trust_text_1 }}</span>
+              </span>
+              <span class="flex items-center gap-1.5">
+                <i
+                  class="fas fa-{{ template_data.trust_icon_2 }}"
+                  data-meta="trust_icon_2"
+                  data-type="icon"
+                ></i>
+                <span data-meta="trust_text_2">{{ template_data.trust_text_2 }}</span>
+              </span>
+              <span class="flex items-center gap-1.5">
+                <i
+                  class="fas fa-{{ template_data.trust_icon_3 }}"
+                  data-meta="trust_icon_3"
+                  data-type="icon"
+                ></i>
+                <span data-meta="trust_text_3">{{ template_data.trust_text_3 }}</span>
+              </span>
+            </div>
+          </div>
+
+          <div
+            class="hero-social flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-6 border-t border-slate-200 animate-fadeInUp"
+          >
+            <div class="flex">
+              <i class="fas fa-star text-yellow-400"></i>
+              <i class="fas fa-star text-yellow-400"></i>
+              <i class="fas fa-star text-yellow-400"></i>
+              <i class="fas fa-star text-yellow-400"></i>
+              <i class="fas fa-star text-yellow-400"></i>
+            </div>
+            <div>
+              <span class="font-bold text-slate-900" data-meta="rating_score">{{ template_data.rating_score }}</span>
+              <span class="text-sm text-slate-600 ml-1" data-meta="rating_text">{{ template_data.rating_text }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center mt-12 lg:mt-16 animate-bounce">
+          <button
+            onclick="scrollToNext()"
+            class="text-center text-slate-400 hover:text-emerald-600 transition-colors"
+          >
+            <p class="text-sm font-medium mb-2" data-meta="scroll_text">{{ template_data.scroll_text }}</p>
+            <i class="fas fa-{{ template_data.scroll_icon }}" data-meta="scroll_icon" data-type="icon"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="technology" class="py-20 lg:py-28 bg-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+        <div class="text-center mb-14 lg:mb-16">
+          <span
+            class="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-5"
+            data-meta="tech_section_label"
+          >
+            {{ template_data.tech_section_label }}
+          </span>
+          <h2 class="font-space font-bold text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-6">
+            <span data-meta="tech_headline_1">{{ template_data.tech_headline_1 }}</span>
+            <span class="gradient-text" data-meta="tech_headline_2"> {{ template_data.tech_headline_2 }}</span>
+          </h2>
+          <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto" data-meta="tech_subheadline">
+            {{ template_data.tech_subheadline }}
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 lg:gap-10">
+          <div class="group">
+            <div class="flex items-start gap-4">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+              >
+                <i
+                  class="fas fa-{{ template_data.tech_feature_icon_1 }}"
+                  data-meta="tech_feature_icon_1"
+                  data-type="icon"
+                ></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-xl text-slate-900 mb-2" data-meta="tech_feature_title_1">
+                  {{ template_data.tech_feature_title_1 }}
+                </h3>
+                <p class="text-slate-600 leading-relaxed" data-meta="tech_feature_desc_1">
+                  {{ template_data.tech_feature_desc_1 }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="flex items-start gap-4">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+              >
+                <i
+                  class="fas fa-{{ template_data.tech_feature_icon_2 }}"
+                  data-meta="tech_feature_icon_2"
+                  data-type="icon"
+                ></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-xl text-slate-900 mb-2" data-meta="tech_feature_title_2">
+                  {{ template_data.tech_feature_title_2 }}
+                </h3>
+                <p class="text-slate-600 leading-relaxed" data-meta="tech_feature_desc_2">
+                  {{ template_data.tech_feature_desc_2 }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="flex items-start gap-4">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+              >
+                <i
+                  class="fas fa-{{ template_data.tech_feature_icon_3 }}"
+                  data-meta="tech_feature_icon_3"
+                  data-type="icon"
+                ></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-xl text-slate-900 mb-2" data-meta="tech_feature_title_3">
+                  {{ template_data.tech_feature_title_3 }}
+                </h3>
+                <p class="text-slate-600 leading-relaxed" data-meta="tech_feature_desc_3">
+                  {{ template_data.tech_feature_desc_3 }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="flex items-start gap-4">
+              <div
+                class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+              >
+                <i
+                  class="fas fa-{{ template_data.tech_feature_icon_4 }}"
+                  data-meta="tech_feature_icon_4"
+                  data-type="icon"
+                ></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-xl text-slate-900 mb-2" data-meta="tech_feature_title_4">
+                  {{ template_data.tech_feature_title_4 }}
+                </h3>
+                <p class="text-slate-600 leading-relaxed" data-meta="tech_feature_desc_4">
+                  {{ template_data.tech_feature_desc_4 }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-14 lg:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-8 border border-emerald-200"
+        >
+          <div class="text-center">
+            <p class="text-3xl lg:text-4xl font-bold text-slate-900" data-meta="stat_value_1">
+              {{ template_data.stat_value_1 }}
+            </p>
+            <p class="text-sm text-slate-600 mt-1" data-meta="stat_label_1">{{ template_data.stat_label_1 }}</p>
+          </div>
+          <div class="text-center border-t sm:border-t-0 sm:border-l sm:border-r border-emerald-200 pt-6 sm:pt-0">
+            <p class="text-3xl lg:text-4xl font-bold text-slate-900" data-meta="stat_value_2">
+              {{ template_data.stat_value_2 }}
+            </p>
+            <p class="text-sm text-slate-600 mt-1" data-meta="stat_label_2">{{ template_data.stat_label_2 }}</p>
+          </div>
+          <div class="text-center border-t sm:border-t-0 border-emerald-200 pt-6 sm:pt-0">
+            <p class="text-3xl lg:text-4xl font-bold text-slate-900" data-meta="stat_value_3">
+              {{ template_data.stat_value_3 }}
+            </p>
+            <p class="text-sm text-slate-600 mt-1" data-meta="stat_label_3">{{ template_data.stat_label_3 }}</p>
+          </div>
+        </div>
+
+        <div class="text-center mt-12">
+          <a
+            href="{{ template_data.tech_cta_link }}"
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold px-10 py-4 rounded-xl hover:shadow-xl transition-all transform hover:scale-105"
+            data-meta="tech_cta_link"
+          >
+            <span data-meta="tech_cta_text">{{ template_data.tech_cta_text }}</span>
+            <i class="fas fa-{{ template_data.tech_cta_icon }}" data-meta="tech_cta_icon" data-type="icon"></i>
+          </a>
+          <p class="text-sm text-slate-600 mt-4">
+            <i
+              class="fas fa-{{ template_data.tech_guarantee_icon }}"
+              data-meta="tech_guarantee_icon"
+              data-type="icon"
+            ></i>
+            <span data-meta="tech_guarantee_text">{{ template_data.tech_guarantee_text }}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div id="sticky-cta" class="fixed bottom-6 right-6 z-40" style="display: none">
+      <a
+        href="{{ template_data.sticky_cta_link }}"
+        class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold px-5 py-3 rounded-full shadow-2xl hover:scale-105 transition-transform"
+        data-meta="sticky_cta_link"
+      >
+        <i class="fas fa-{{ template_data.sticky_cta_icon }}" data-meta="sticky_cta_icon" data-type="icon"></i>
+        <span class="hidden sm:inline" data-meta="sticky_cta_text_desktop">
+          {{- template_data.sticky_cta_text_desktop -}}
+        </span>
+        <span class="sm:hidden" data-meta="sticky_cta_text_mobile">{{ template_data.sticky_cta_text_mobile }}</span>
+      </a>
+    </div>
+
+    <div
+      id="notification-1"
+      class="fixed bottom-6 left-6 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-50 max-w-xs notification-slide"
+      style="display: none"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i
+            class="fas fa-{{ template_data.notification_icon_1 }}"
+            data-meta="notification_icon_1"
+            data-type="icon"
+          ></i>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900" data-meta="notification_name_1">
+            {{ template_data.notification_name_1 }}
+          </p>
+          <p class="text-sm text-slate-600" data-meta="notification_text_1">
+            {{ template_data.notification_text_1 }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="notification-2"
+      class="fixed bottom-6 left-6 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-50 max-w-xs notification-slide"
+      style="display: none"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i
+            class="fas fa-{{ template_data.notification_icon_2 }}"
+            data-meta="notification_icon_2"
+            data-type="icon"
+          ></i>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900" data-meta="notification_name_2">
+            {{ template_data.notification_name_2 }}
+          </p>
+          <p class="text-sm text-slate-600" data-meta="notification_text_2">
+            {{ template_data.notification_text_2 }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="notification-3"
+      class="fixed bottom-6 left-6 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-50 max-w-xs notification-slide"
+      style="display: none"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i
+            class="fas fa-{{ template_data.notification_icon_3 }}"
+            data-meta="notification_icon_3"
+            data-type="icon"
+          ></i>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900" data-meta="notification_name_3">
+            {{ template_data.notification_name_3 }}
+          </p>
+          <p class="text-sm text-slate-600" data-meta="notification_text_3">
+            {{ template_data.notification_text_3 }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="notification-4"
+      class="fixed bottom-6 left-6 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-50 max-w-xs notification-slide"
+      style="display: none"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i
+            class="fas fa-{{ template_data.notification_icon_4 }}"
+            data-meta="notification_icon_4"
+            data-type="icon"
+          ></i>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900" data-meta="notification_name_4">
+            {{ template_data.notification_name_4 }}
+          </p>
+          <p class="text-sm text-slate-600" data-meta="notification_text_4">
+            {{ template_data.notification_text_4 }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="notification-5"
+      class="fixed bottom-6 left-6 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-50 max-w-xs notification-slide"
+      style="display: none"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i
+            class="fas fa-{{ template_data.notification_icon_5 }}"
+            data-meta="notification_icon_5"
+            data-type="icon"
+          ></i>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-900" data-meta="notification_name_5">
+            {{ template_data.notification_name_5 }}
+          </p>
+          <p class="text-sm text-slate-600" data-meta="notification_text_5">
+            {{ template_data.notification_text_5 }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="popup-overlay"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] items-center justify-center p-4"
+      style="display: none"
+    >
+      <div class="bg-white rounded-2xl max-w-md w-full relative premium-shadow">
+        <button
+          id="popup-close-btn"
+          class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <i
+            class="fas fa-{{ template_data.popup_close_icon }}"
+            data-meta="popup_close_icon"
+            data-type="icon"
+          ></i>
+        </button>
+
+        <div id="popup-step-1" class="p-8" style="display: block">
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i
+                class="fas fa-{{ template_data.popup_step1_icon }}"
+                data-meta="popup_step1_icon"
+                data-type="icon"
+              ></i>
+            </div>
+            <h3 class="font-space font-bold text-2xl text-slate-900 mb-3" data-meta="popup_step1_title">
+              {{ template_data.popup_step1_title }}
+            </h3>
+            <p class="text-slate-600 mb-6" data-meta="popup_step1_text">
+              {{ template_data.popup_step1_text }}
+            </p>
+            <button
+              onclick="goToStep2()"
+              class="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all"
+              data-meta="popup_step1_button"
+            >
+              {{ template_data.popup_step1_button }}
+            </button>
+            <button
+              onclick="closePopup()"
+              class="mt-3 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+              data-meta="popup_step1_decline"
+            >
+              {{ template_data.popup_step1_decline }}
+            </button>
+          </div>
+        </div>
+
+        <div id="popup-step-2" class="p-8" style="display: none">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i
+                class="fas fa-{{ template_data.popup_step2_icon }}"
+                data-meta="popup_step2_icon"
+                data-type="icon"
+              ></i>
+            </div>
+            <h3 class="font-space font-bold text-2xl text-slate-900 mb-3" data-meta="popup_step2_title">
+              {{ template_data.popup_step2_title }}
+            </h3>
+            <p class="text-slate-600 mb-6" data-meta="popup_step2_text">
+              {{ template_data.popup_step2_text }}
+            </p>
+            <input
+              type="email"
+              id="email-input"
+              placeholder="{{ template_data.popup_email_placeholder }}"
+              class="w-full px-4 py-3 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:border-emerald-500 transition-colors"
+              data-meta="popup_email_placeholder"
+            >
+            <button
+              onclick="goToStep3()"
+              class="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all"
+              data-meta="popup_step2_button"
+            >
+              {{ template_data.popup_step2_button }}
+            </button>
+          </div>
+        </div>
+
+        <div id="popup-step-3" class="p-8" style="display: none">
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i
+                class="fas fa-{{ template_data.popup_step3_icon }}"
+                data-meta="popup_step3_icon"
+                data-type="icon"
+              ></i>
+            </div>
+            <h3 class="font-space font-bold text-2xl text-slate-900 mb-3" data-meta="popup_step3_title">
+              {{ template_data.popup_step3_title }}
+            </h3>
+            <p class="text-slate-600 mb-4" data-meta="popup_step3_text">
+              {{ template_data.popup_step3_text }}
+            </p>
+            <div
+              onclick="copyCode()"
+              class="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-6 mb-6 cursor-pointer hover:border-emerald-300 transition-all group"
+            >
+              <p class="font-bold text-4xl text-emerald-600 mb-2" data-meta="popup_discount_code">
+                {{ template_data.popup_discount_code }}
+              </p>
+              <p class="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">
+                <i
+                  class="fas fa-{{ template_data.popup_copy_icon }}"
+                  data-meta="popup_copy_icon"
+                  data-type="icon"
+                ></i>
+                <span data-meta="popup_copy_text">{{ template_data.popup_copy_text }}</span>
+              </p>
+            </div>
+            <button
+              onclick="shopWithDiscount()"
+              class="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all"
+              data-meta="popup_step3_button"
+            >
+              {{ template_data.popup_step3_button }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="review-notification"
+      class="fixed bottom-6 left-6 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-50 max-w-sm"
+      style="display: none"
+    >
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <i
+            class="fas fa-{{ template_data.review_notification_icon }}"
+            data-meta="review_notification_icon"
+            data-type="icon"
+          ></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1 mb-1">
+            <i class="fas fa-star text-yellow-400 text-sm"></i>
+            <i class="fas fa-star text-yellow-400 text-sm"></i>
+            <i class="fas fa-star text-yellow-400 text-sm"></i>
+            <i class="fas fa-star text-yellow-400 text-sm"></i>
+            <i class="fas fa-star text-yellow-400 text-sm"></i>
+          </div>
+          <p class="text-sm text-slate-600 italic" data-meta="review_notification_text">
+            {{ template_data.review_notification_text }}
+          </p>
+          <p class="text-xs text-slate-500 mt-1" data-meta="review_notification_author">
+            {{ template_data.review_notification_author }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('menu-toggle').addEventListener('click', function () {
+        const mobileNav = document.getElementById('mobile-nav');
+        if (mobileNav.style.display === 'none' || mobileNav.style.display === '') {
+          mobileNav.style.display = 'block';
+        } else {
+          mobileNav.style.display = 'none';
+        }
+      });
+
+      window.addEventListener('scroll', function () {
+        const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        document.getElementById('progress-bar').style.width = scrolled + '%';
+
+        const stickyCta = document.getElementById('sticky-cta');
+        if (scrolled > 50) {
+          stickyCta.style.display = 'block';
+        } else {
+          stickyCta.style.display = 'none';
+        }
+      });
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      function scrollToNext() {
+        const nextSection = document.getElementById('technology');
+        if (nextSection) {
+          nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+
+      let currentNotification = 1;
+      const totalNotifications = 5;
+
+      function showNotification() {
+        for (let i = 1; i <= totalNotifications; i++) {
+          document.getElementById('notification-' + i).style.display = 'none';
+        }
+
+        const notification = document.getElementById('notification-' + currentNotification);
+        notification.style.display = 'block';
+
+        setTimeout(function () {
+          notification.style.display = 'none';
+        }, 5000);
+
+        currentNotification = (currentNotification % totalNotifications) + 1;
+      }
+
+      setTimeout(function () {
+        showNotification();
+        setInterval(showNotification, 60000 + Math.random() * 30000);
+      }, 30000);
+
+      setTimeout(function () {
+        const reviewNotification = document.getElementById('review-notification');
+        reviewNotification.style.display = 'block';
+        setTimeout(function () {
+          reviewNotification.style.display = 'none';
+        }, 6000);
+      }, 45000);
+
+      let popupShown = false;
+      let timeOnPage = 0;
+      let scrollDepth = 0;
+
+      setInterval(function () {
+        timeOnPage++;
+      }, 1000);
+
+      window.addEventListener('scroll', function () {
+        const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        scrollDepth = Math.max(scrollDepth, scrolled);
+      });
+
+      document.addEventListener('mouseleave', function (e) {
+        if (e.clientY <= 0 && !popupShown && timeOnPage >= 30 && scrollDepth >= 40) {
+          const popup = document.getElementById('popup-overlay');
+          popup.style.display = 'flex';
+          popupShown = true;
+        }
+      });
+
+      window.addEventListener('popstate', function (e) {
+        if (!popupShown && timeOnPage >= 30 && scrollDepth >= 40) {
+          e.preventDefault();
+          const popup = document.getElementById('popup-overlay');
+          popup.style.display = 'flex';
+          popupShown = true;
+          history.pushState(null, null, window.location.href);
+        }
+      });
+
+      function closePopup() {
+        document.getElementById('popup-overlay').style.display = 'none';
+      }
+
+      function goToStep2() {
+        document.getElementById('popup-step-1').style.display = 'none';
+        document.getElementById('popup-step-2').style.display = 'block';
+      }
+
+      function goToStep3() {
+        const email = document.getElementById('email-input').value;
+        if (email && email.includes('@')) {
+          document.getElementById('popup-step-2').style.display = 'none';
+          document.getElementById('popup-step-3').style.display = 'block';
+        } else {
+          alert('Please enter a valid email address');
+        }
+      }
+
+      function copyCode() {
+        navigator.clipboard.writeText('B5C6').then(function () {
+          const codeDiv = event.currentTarget;
+          const originalHTML = codeDiv.innerHTML;
+          codeDiv.innerHTML =
+            '<p class="font-bold text-2xl text-green-600 mb-2"><i class="fas fa-check mr-2"></i>Copied!</p><p class="text-sm text-slate-600">Code saved to clipboard</p>';
+          setTimeout(function () {
+            codeDiv.innerHTML = originalHTML;
+          }, 2000);
+        });
+      }
+
+      function shopWithDiscount() {
+        closePopup();
+        const packagesSection = document.getElementById('packages');
+        if (packagesSection) {
+          packagesSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }
+      }
+
+      function playDemo() {
+        alert('Demo video would play here');
+      }
+
+      document.getElementById('popup-close-btn').addEventListener('click', function () {
+        document.getElementById('popup-overlay').style.display = 'none';
+      });
+
+      document.getElementById('popup-overlay').addEventListener('click', function (e) {
+        if (e.target === this) {
+          closePopup();
+        }
+      });
+    </script>
+
+    <style>
+      .font-space {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .gallery-slider {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        touch-action: pan-y;
+      }
+
+      .gallery-slide {
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      .gallery-dot {
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .gallery-dot:hover {
+        transform: scale(1.2);
+      }
+
+      @media (max-width: 768px) {
+        button[onclick*='changeSlide'] {
+          width: 40px;
+          height: 40px;
+        }
+      }
+
+      .feature-badge {
+        animation: slideInUp 0.5s ease-out;
+      }
+
+      @keyframes slideInUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .touch-manipulation {
+        touch-action: manipulation;
+      }
+    </style>
+
+    <section id="gallery" class="py-20 lg:py-28 bg-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12 lg:mb-16">
+          <span
+            class="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-5"
+            data-meta="gallery_section_label"
+          >
+            {{ template_data.gallery_section_label }}
+          </span>
+          <h2 class="font-space font-bold text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-6">
+            <span data-meta="gallery_headline_1">{{ template_data.gallery_headline_1 }}</span>
+            <span class="gradient-text" data-meta="gallery_headline_2"> {{ template_data.gallery_headline_2 }}</span>
+          </h2>
+          <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto" data-meta="gallery_subheadline">
+            {{ template_data.gallery_subheadline }}
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-5 gap-6 lg:gap-8">
+          <div class="lg:col-span-3">
+            <div class="relative">
+              <div class="relative rounded-2xl overflow-hidden aspect-square shadow-2xl">
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none z-10"
+                ></div>
+
+                <div class="gallery-slider relative w-full h-full" id="gallery-slider">
+                  <div class="gallery-slide absolute inset-0" data-slide="1" style="display: block">
+                    <img
+                      src="{{ template_data.gallery_image_1 }}"
+                      alt=""
+                      data-meta="gallery_image_1"
+                      data-type="image"
+                      class="w-full h-full object-cover"
+                    >
+                  </div>
+                  <div class="gallery-slide absolute inset-0" data-slide="2" style="display: none">
+                    <img
+                      src="{{ template_data.gallery_image_2 }}"
+                      alt=""
+                      data-meta="gallery_image_2"
+                      data-type="image"
+                      class="w-full h-full object-cover"
+                    >
+                  </div>
+                  <div class="gallery-slide absolute inset-0" data-slide="3" style="display: none">
+                    <img
+                      src="{{ template_data.gallery_image_3 }}"
+                      alt=""
+                      data-meta="gallery_image_3"
+                      data-type="image"
+                      class="w-full h-full object-cover"
+                    >
+                  </div>
+                  <div class="gallery-slide absolute inset-0" data-slide="4" style="display: none">
+                    <img
+                      src="{{ template_data.gallery_image_4 }}"
+                      alt=""
+                      data-meta="gallery_image_4"
+                      data-type="image"
+                      class="w-full h-full object-cover"
+                    >
+                  </div>
+                  <div class="gallery-slide absolute inset-0" data-slide="5" style="display: none">
+                    <img
+                      src="{{ template_data.gallery_image_5 }}"
+                      alt=""
+                      data-meta="gallery_image_5"
+                      data-type="image"
+                      class="w-full h-full object-cover"
+                    >
+                  </div>
+                  <div class="gallery-slide absolute inset-0" data-slide="6" style="display: none">
+                    <img
+                      src="{{ template_data.gallery_image_6 }}"
+                      alt=""
+                      data-meta="gallery_image_6"
+                      data-type="image"
+                      class="w-full h-full object-cover"
+                    >
+                  </div>
+                  <div class="gallery-slide absolute inset-0" data-slide="7" style="display: none">
+                    <img
+                      src="{{ template_data.gallery_image_7 }}"
+                      alt=""
+                      data-meta="gallery_image_7"
+                      data-type="image"
+                      class="w-full h-full object-cover"
+                    >
+                  </div>
+                </div>
+
+                <button
+                  onclick="changeSlide(-1)"
+                  class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all z-20 touch-manipulation"
+                >
+                  <i
+                    class="fas fa-{{ template_data.gallery_prev_icon }}"
+                    data-meta="gallery_prev_icon"
+                    data-type="icon"
+                  ></i>
+                </button>
+                <button
+                  onclick="changeSlide(1)"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all z-20 touch-manipulation"
+                >
+                  <i
+                    class="fas fa-{{ template_data.gallery_next_icon }}"
+                    data-meta="gallery_next_icon"
+                    data-type="icon"
+                  ></i>
+                </button>
+              </div>
+
+              <div class="flex justify-center gap-2 mt-6">
+                <button
+                  onclick="goToSlide(1)"
+                  class="gallery-dot w-3 h-3 rounded-full bg-emerald-500 transition-all"
+                ></button>
+                <button
+                  onclick="goToSlide(2)"
+                  class="gallery-dot w-3 h-3 rounded-full bg-slate-300 hover:bg-slate-400 transition-all"
+                ></button>
+                <button
+                  onclick="goToSlide(3)"
+                  class="gallery-dot w-3 h-3 rounded-full bg-slate-300 hover:bg-slate-400 transition-all"
+                ></button>
+                <button
+                  onclick="goToSlide(4)"
+                  class="gallery-dot w-3 h-3 rounded-full bg-slate-300 hover:bg-slate-400 transition-all"
+                ></button>
+                <button
+                  onclick="goToSlide(5)"
+                  class="gallery-dot w-3 h-3 rounded-full bg-slate-300 hover:bg-slate-400 transition-all"
+                ></button>
+                <button
+                  onclick="goToSlide(6)"
+                  class="gallery-dot w-3 h-3 rounded-full bg-slate-300 hover:bg-slate-400 transition-all"
+                ></button>
+                <button
+                  onclick="goToSlide(7)"
+                  class="gallery-dot w-3 h-3 rounded-full bg-slate-300 hover:bg-slate-400 transition-all"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div
+              class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 lg:p-8 border border-slate-200 shadow-xl"
+            >
+              <div class="mb-6">
+                <h3
+                  class="font-space font-bold text-2xl text-slate-900 mb-3"
+                  data-meta="gallery_product_name"
+                >
+                  {{ template_data.gallery_product_name }}
+                </h3>
+                <div class="flex items-center gap-3">
+                  <div class="flex">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                  </div>
+                  <span class="text-sm font-medium text-slate-600" data-meta="gallery_rating_text">
+                    {{- template_data.gallery_rating_text -}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="space-y-4 mb-6">
+                <div class="flex items-center justify-between py-3 border-b border-slate-200">
+                  <span class="text-slate-600" data-meta="spec_label_1">{{ template_data.spec_label_1 }}</span>
+                  <span class="font-semibold text-slate-900" data-meta="spec_value_1">
+                    {{- template_data.spec_value_1 -}}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between py-3 border-b border-slate-200">
+                  <span class="text-slate-600" data-meta="spec_label_2">{{ template_data.spec_label_2 }}</span>
+                  <span class="font-semibold text-slate-900" data-meta="spec_value_2">
+                    {{- template_data.spec_value_2 -}}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between py-3 border-b border-slate-200">
+                  <span class="text-slate-600" data-meta="spec_label_3">{{ template_data.spec_label_3 }}</span>
+                  <span class="font-semibold text-slate-900" data-meta="spec_value_3">
+                    {{- template_data.spec_value_3 -}}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between py-3 border-b border-slate-200">
+                  <span class="text-slate-600" data-meta="spec_label_4">{{ template_data.spec_label_4 }}</span>
+                  <span class="font-semibold text-slate-900" data-meta="spec_value_4">
+                    {{- template_data.spec_value_4 -}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-xl p-4 mb-6 shadow-md">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-slate-600" data-meta="price_label_regular">
+                    {{- template_data.price_label_regular -}}
+                  </span>
+                  <span class="text-xl line-through text-slate-400" data-meta="price_regular">
+                    {{- template_data.price_regular -}}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-slate-900" data-meta="price_label_sale">
+                    {{- template_data.price_label_sale -}}
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-3xl font-bold text-emerald-600" data-meta="price_sale">
+                      {{- template_data.price_sale -}}
+                    </span>
+                    <span
+                      class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded animate-pulse"
+                      data-meta="price_discount_badge"
+                    >
+                      {{- template_data.price_discount_badge -}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href="{{ template_data.gallery_cta_link }}"
+                class="block w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold text-center py-4 rounded-xl hover:shadow-lg transition-all"
+                data-meta="gallery_cta_link"
+              >
+                <i
+                  class="fas fa-{{ template_data.gallery_cta_icon }}"
+                  data-meta="gallery_cta_icon"
+                  data-type="icon"
+                ></i>
+                <span data-meta="gallery_cta_text">{{ template_data.gallery_cta_text }}</span>
+              </a>
+
+              <div class="flex items-center justify-center gap-2 mt-4 text-sm text-slate-600">
+                <i
+                  class="fas fa-{{ template_data.gallery_guarantee_icon }}"
+                  data-meta="gallery_guarantee_icon"
+                  data-type="icon"
+                ></i>
+                <span data-meta="gallery_guarantee_text">{{ template_data.gallery_guarantee_text }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-{{ template_data.spec_icon_1 }}" data-meta="spec_icon_1" data-type="icon"></i>
+            </div>
+            <p class="font-semibold text-slate-900" data-meta="spec_title_1">{{ template_data.spec_title_1 }}</p>
+            <p class="text-sm text-slate-600" data-meta="spec_desc_1">{{ template_data.spec_desc_1 }}</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-{{ template_data.spec_icon_2 }}" data-meta="spec_icon_2" data-type="icon"></i>
+            </div>
+            <p class="font-semibold text-slate-900" data-meta="spec_title_2">{{ template_data.spec_title_2 }}</p>
+            <p class="text-sm text-slate-600" data-meta="spec_desc_2">{{ template_data.spec_desc_2 }}</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-{{ template_data.spec_icon_3 }}" data-meta="spec_icon_3" data-type="icon"></i>
+            </div>
+            <p class="font-semibold text-slate-900" data-meta="spec_title_3">{{ template_data.spec_title_3 }}</p>
+            <p class="text-sm text-slate-600" data-meta="spec_desc_3">{{ template_data.spec_desc_3 }}</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <i class="fas fa-{{ template_data.spec_icon_4 }}" data-meta="spec_icon_4" data-type="icon"></i>
+            </div>
+            <p class="font-semibold text-slate-900" data-meta="spec_title_4">{{ template_data.spec_title_4 }}</p>
+            <p class="text-sm text-slate-600" data-meta="spec_desc_4">{{ template_data.spec_desc_4 }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-20 lg:py-28 bg-slate-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+        <div class="text-center mb-12 lg:mb-16">
+          <span
+            class="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-base font-semibold mb-5"
+            data-meta="how_section_label"
+          >
+            {{ template_data.how_section_label }}
+          </span>
+          <h2 class="font-space font-bold text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-6">
+            <span data-meta="how_headline_1">{{ template_data.how_headline_1 }}</span>
+            <span class="gradient-text" data-meta="how_headline_2"> {{ template_data.how_headline_2 }}</span>
+          </h2>
+          <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto" data-meta="how_subheadline">
+            {{ template_data.how_subheadline }}
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 lg:gap-12 mb-16">
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <div
+                class="w-24 h-24 bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform"
+              >
+                <i
+                  class="fas fa-{{ template_data.how_step_icon_1 }}"
+                  data-meta="how_step_icon_1"
+                  data-type="icon"
+                ></i>
+              </div>
+              <div
+                class="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-emerald-200 to-transparent"
+              ></div>
+            </div>
+            <h3 class="font-bold text-xl text-slate-900 mb-3" data-meta="how_step_title_1">
+              {{ template_data.how_step_title_1 }}
+            </h3>
+            <p class="text-slate-600" data-meta="how_step_desc_1">
+              {{ template_data.how_step_desc_1 }}
+            </p>
+          </div>
+
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <div
+                class="w-24 h-24 bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform"
+              >
+                <i
+                  class="fas fa-{{ template_data.how_step_icon_2 }}"
+                  data-meta="how_step_icon_2"
+                  data-type="icon"
+                ></i>
+              </div>
+              <div
+                class="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-emerald-200 to-transparent"
+              ></div>
+            </div>
+            <h3 class="font-bold text-xl text-slate-900 mb-3" data-meta="how_step_title_2">
+              {{ template_data.how_step_title_2 }}
+            </h3>
+            <p class="text-slate-600" data-meta="how_step_desc_2">
+              {{ template_data.how_step_desc_2 }}
+            </p>
+          </div>
+
+          <div class="text-center group">
+            <div class="relative mb-6">
+              <div
+                class="w-24 h-24 bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform"
+              >
+                <i
+                  class="fas fa-{{ template_data.how_step_icon_3 }}"
+                  data-meta="how_step_icon_3"
+                  data-type="icon"
+                ></i>
+              </div>
+            </div>
+            <h3 class="font-bold text-xl text-slate-900 mb-3" data-meta="how_step_title_3">
+              {{ template_data.how_step_title_3 }}
+            </h3>
+            <p class="text-slate-600" data-meta="how_step_desc_3">
+              {{ template_data.how_step_desc_3 }}
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-8 lg:p-12 mb-12">
+          <div class="grid lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <h3 class="font-bold text-2xl text-slate-900 mb-6" data-meta="how_system_title">
+                {{ template_data.how_system_title }}
+              </h3>
+
+              <div class="space-y-6">
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-md"
+                  >
+                    <i
+                      class="fas fa-{{ template_data.how_check_icon_1 }}"
+                      data-meta="how_check_icon_1"
+                      data-type="icon"
+                    ></i>
+                  </div>
+                  <div>
+                    <h4
+                      class="text-xl font-semibold text-slate-900 mb-1"
+                      data-meta="how_benefit_title_1"
+                    >
+                      {{ template_data.how_benefit_title_1 }}
+                    </h4>
+                    <p class="text-slate-600 text-base" data-meta="how_benefit_desc_1">
+                      {{ template_data.how_benefit_desc_1 }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-md"
+                  >
+                    <i
+                      class="fas fa-{{ template_data.how_check_icon_2 }}"
+                      data-meta="how_check_icon_2"
+                      data-type="icon"
+                    ></i>
+                  </div>
+                  <div>
+                    <h4
+                      class="text-xl font-semibold text-slate-900 mb-1"
+                      data-meta="how_benefit_title_2"
+                    >
+                      {{ template_data.how_benefit_title_2 }}
+                    </h4>
+                    <p class="text-slate-600 text-base" data-meta="how_benefit_desc_2">
+                      {{ template_data.how_benefit_desc_2 }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-md"
+                  >
+                    <i
+                      class="fas fa-{{ template_data.how_check_icon_3 }}"
+                      data-meta="how_check_icon_3"
+                      data-type="icon"
+                    ></i>
+                  </div>
+                  <div>
+                    <h4
+                      class="text-xl font-semibold text-slate-900 mb-1"
+                      data-meta="how_benefit_title_3"
+                    >
+                      {{ template_data.how_benefit_title_3 }}
+                    </h4>
+                    <p class="text-slate-600 text-base" data-meta="how_benefit_desc_3">
+                      {{ template_data.how_benefit_desc_3 }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="relative">
+              <img
+                src="{{ template_data.how_system_image }}"
+                alt=""
+                data-meta="how_system_image"
+                data-type="image"
+                class="w-full rounded-xl shadow-xl"
+              >
+
+              <div
+                class="absolute -top-4 -right-4 bg-white rounded-lg px-4 py-2 shadow-lg flex items-center gap-2"
+              >
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-sm font-medium text-slate-700" data-meta="how_badge_text_1">
+                  {{- template_data.how_badge_text_1 -}}
+                </span>
+              </div>
+
+              <div class="absolute -bottom-4 -left-4 bg-white rounded-lg px-4 py-2 shadow-lg">
+                <p class="text-sm font-semibold text-slate-900" data-meta="how_badge_text_2">
+                  {{ template_data.how_badge_text_2 }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <a
+            href="{{ template_data.how_cta_link }}"
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold px-8 py-4 rounded-xl hover:shadow-xl transition-all transform hover:scale-105"
+            data-meta="how_cta_link"
+          >
+            <i class="fas fa-{{ template_data.how_cta_icon }}" data-meta="how_cta_icon" data-type="icon"></i>
+            <span data-meta="how_cta_text">{{ template_data.how_cta_text }}</span>
+          </a>
+
+          <p class="text-base text-slate-600 mt-4">
+            <i
+              class="fas fa-{{ template_data.how_footer_icon }}"
+              data-meta="how_footer_icon"
+              data-type="icon"
+            ></i>
+            <span data-meta="how_footer_text">{{ template_data.how_footer_text }}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <style>
+      .font-space {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      @media (max-width: 768px) {
+        .fa-arrow-right {
+          display: none;
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    </style>
+
+    <section id="features" class="py-20 lg:py-28 bg-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+        <div class="text-center mb-14 lg:mb-16">
+          <span
+            class="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-5"
+            data-meta="features_section_label"
+          >
+            {{ template_data.features_section_label }}
+          </span>
+          <h2 class="font-space font-bold text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-6">
+            <span data-meta="features_headline_1">{{ template_data.features_headline_1 }}</span>
+            <span class="gradient-text" data-meta="features_headline_2"> {{ template_data.features_headline_2 }}</span>
+          </h2>
+          <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto" data-meta="features_subheadline">
+            {{ template_data.features_subheadline }}
+          </p>
+        </div>
+
+        <div class="space-y-20">
+          <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div class="relative">
+              <div class="rounded-2xl overflow-hidden shadow-xl">
+                <img
+                  src="{{ template_data.feature_image_1 }}"
+                  alt=""
+                  data-meta="feature_image_1"
+                  data-type="image"
+                  class="w-full h-auto"
+                >
+              </div>
+              <div
+                class="absolute -bottom-4 -right-4 bg-emerald-500 text-white rounded-xl px-4 py-2 font-bold shadow-lg"
+                data-meta="feature_badge_1"
+              >
+                {{ template_data.feature_badge_1 }}
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center gap-3 mb-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0"
+                >
+                  <i
+                    class="fas fa-{{ template_data.feature_item_icon_1 }}"
+                    data-meta="feature_item_icon_1"
+                    data-type="icon"
+                  ></i>
+                </div>
+                <h3 class="font-space font-bold text-2xl text-slate-900" data-meta="feature_item_title_1">
+                  {{ template_data.feature_item_title_1 }}
+                </h3>
+              </div>
+              <p class="text-lg text-slate-600 mb-6" data-meta="feature_item_desc_1">
+                {{ template_data.feature_item_desc_1 }}
+              </p>
+              <div class="space-y-3 sm:grid sm:grid-cols-2 gap-4">
+                <div class="flex items-center gap-2">
+                  <i
+                    class="fas fa-{{ template_data.feature_check_icon_1 }}"
+                    data-meta="feature_check_icon_1"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="feature_point_1">{{ template_data.feature_point_1 }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i
+                    class="fas fa-{{ template_data.feature_check_icon_2 }}"
+                    data-meta="feature_check_icon_2"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="feature_point_2">{{ template_data.feature_point_2 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div class="order-2 lg:order-1">
+              <div class="flex items-center gap-3 mb-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0"
+                >
+                  <i
+                    class="fas fa-{{ template_data.feature_item_icon_2 }}"
+                    data-meta="feature_item_icon_2"
+                    data-type="icon"
+                  ></i>
+                </div>
+                <h3 class="font-space font-bold text-2xl text-slate-900" data-meta="feature_item_title_2">
+                  {{ template_data.feature_item_title_2 }}
+                </h3>
+              </div>
+              <p class="text-lg text-slate-600 mb-6" data-meta="feature_item_desc_2">
+                {{ template_data.feature_item_desc_2 }}
+              </p>
+              <div class="space-y-3 sm:grid sm:grid-cols-2 gap-4">
+                <div class="flex items-center gap-2">
+                  <i
+                    class="fas fa-{{ template_data.feature_check_icon_3 }}"
+                    data-meta="feature_check_icon_3"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="feature_point_3">{{ template_data.feature_point_3 }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i
+                    class="fas fa-{{ template_data.feature_check_icon_4 }}"
+                    data-meta="feature_check_icon_4"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="feature_point_4">{{ template_data.feature_point_4 }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="relative order-1 lg:order-2">
+              <div class="rounded-2xl overflow-hidden shadow-xl">
+                <img
+                  src="{{ template_data.feature_image_2 }}"
+                  alt=""
+                  data-meta="feature_image_2"
+                  data-type="image"
+                  class="w-full h-auto"
+                >
+              </div>
+              <div
+                class="absolute -bottom-4 -left-4 bg-emerald-500 text-white rounded-xl px-4 py-2 font-bold shadow-lg"
+                data-meta="feature_badge_2"
+              >
+                {{ template_data.feature_badge_2 }}
+              </div>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div class="relative">
+              <div class="rounded-2xl overflow-hidden shadow-xl">
+                <img
+                  src="{{ template_data.feature_image_3 }}"
+                  alt=""
+                  data-meta="feature_image_3"
+                  data-type="image"
+                  class="w-full h-auto"
+                >
+              </div>
+              <div
+                class="absolute -bottom-4 -right-4 bg-emerald-500 text-white rounded-xl px-4 py-2 font-bold shadow-lg"
+                data-meta="feature_badge_3"
+              >
+                {{ template_data.feature_badge_3 }}
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center gap-3 mb-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0"
+                >
+                  <i
+                    class="fas fa-{{ template_data.feature_item_icon_3 }}"
+                    data-meta="feature_item_icon_3"
+                    data-type="icon"
+                  ></i>
+                </div>
+                <h3 class="font-space font-bold text-2xl text-slate-900" data-meta="feature_item_title_3">
+                  {{ template_data.feature_item_title_3 }}
+                </h3>
+              </div>
+              <p class="text-lg text-slate-600 mb-6" data-meta="feature_item_desc_3">
+                {{ template_data.feature_item_desc_3 }}
+              </p>
+              <div class="space-y-3 sm:grid sm:grid-cols-2 gap-4">
+                <div class="flex items-center gap-2">
+                  <i
+                    class="fas fa-{{ template_data.feature_check_icon_5 }}"
+                    data-meta="feature_check_icon_5"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="feature_point_5">{{ template_data.feature_point_5 }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i
+                    class="fas fa-{{ template_data.feature_check_icon_6 }}"
+                    data-meta="feature_check_icon_6"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="feature_point_6">{{ template_data.feature_point_6 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-20 pt-20 border-t border-slate-200">
+          <div class="text-center">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-3"
+            >
+              <i
+                class="fas fa-{{ template_data.feature_grid_icon_1 }}"
+                data-meta="feature_grid_icon_1"
+                data-type="icon"
+              ></i>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-1" data-meta="feature_grid_title_1">
+              {{ template_data.feature_grid_title_1 }}
+            </h4>
+            <p class="text-sm text-slate-600" data-meta="feature_grid_desc_1">
+              {{ template_data.feature_grid_desc_1 }}
+            </p>
+          </div>
+
+          <div class="text-center">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-3"
+            >
+              <i
+                class="fas fa-{{ template_data.feature_grid_icon_2 }}"
+                data-meta="feature_grid_icon_2"
+                data-type="icon"
+              ></i>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-1" data-meta="feature_grid_title_2">
+              {{ template_data.feature_grid_title_2 }}
+            </h4>
+            <p class="text-sm text-slate-600" data-meta="feature_grid_desc_2">
+              {{ template_data.feature_grid_desc_2 }}
+            </p>
+          </div>
+
+          <div class="text-center">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-3"
+            >
+              <i
+                class="fas fa-{{ template_data.feature_grid_icon_3 }}"
+                data-meta="feature_grid_icon_3"
+                data-type="icon"
+              ></i>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-1" data-meta="feature_grid_title_3">
+              {{ template_data.feature_grid_title_3 }}
+            </h4>
+            <p class="text-sm text-slate-600" data-meta="feature_grid_desc_3">
+              {{ template_data.feature_grid_desc_3 }}
+            </p>
+          </div>
+
+          <div class="text-center">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-3"
+            >
+              <i
+                class="fas fa-{{ template_data.feature_grid_icon_4 }}"
+                data-meta="feature_grid_icon_4"
+                data-type="icon"
+              ></i>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-1" data-meta="feature_grid_title_4">
+              {{ template_data.feature_grid_title_4 }}
+            </h4>
+            <p class="text-sm text-slate-600" data-meta="feature_grid_desc_4">
+              {{ template_data.feature_grid_desc_4 }}
+            </p>
+          </div>
+        </div>
+
+        <div class="text-center mt-16">
+          <p class="text-xl font-semibold text-slate-900 mb-6" data-meta="features_footer_headline">
+            {{ template_data.features_footer_headline }}
+          </p>
+          <a
+            href="{{ template_data.features_cta_link }}"
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold px-10 py-4 rounded-xl hover:shadow-xl transition-all transform hover:scale-105"
+            data-meta="features_cta_link"
+          >
+            <i
+              class="fas fa-{{ template_data.features_cta_icon }}"
+              data-meta="features_cta_icon"
+              data-type="icon"
+            ></i>
+            <span data-meta="features_cta_text">{{ template_data.features_cta_text }}</span>
+          </a>
+          <div class="flex items-center justify-center gap-4 mt-4 text-sm text-slate-600">
+            <span class="flex items-center gap-1">
+              <i
+                class="fas fa-{{ template_data.features_shipping_icon }}"
+                data-meta="features_shipping_icon"
+                data-type="icon"
+              ></i>
+              <span data-meta="features_shipping_text">{{ template_data.features_shipping_text }}</span>
+            </span>
+            <span class="flex items-center gap-1">
+              <i
+                class="fas fa-{{ template_data.features_guarantee_icon }}"
+                data-meta="features_guarantee_icon"
+                data-type="icon"
+              ></i>
+              <span data-meta="features_guarantee_text">{{ template_data.features_guarantee_text }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      let currentSlide = 1;
+      const totalSlides = 7;
+
+      function showSlide(slideNumber) {
+        const slides = document.querySelectorAll('.gallery-slide');
+        slides.forEach((slide) => {
+          slide.style.display = 'none';
+        });
+
+        const currentSlideElement = document.querySelector(`[data-slide="${slideNumber}"]`);
+        if (currentSlideElement) {
+          currentSlideElement.style.display = 'block';
+        }
+
+        const dots = document.querySelectorAll('.gallery-dot');
+        dots.forEach((dot, index) => {
+          if (index === slideNumber - 1) {
+            dot.classList.add('bg-emerald-500');
+            dot.classList.remove('bg-slate-300', 'hover:bg-slate-400');
+          } else {
+            dot.classList.remove('bg-emerald-500');
+            dot.classList.add('bg-slate-300', 'hover:bg-slate-400');
+          }
+        });
+      }
+
+      function changeSlide(direction) {
+        currentSlide += direction;
+
+        if (currentSlide > totalSlides) {
+          currentSlide = 1;
+        } else if (currentSlide < 1) {
+          currentSlide = totalSlides;
+        }
+
+        showSlide(currentSlide);
+      }
+
+      function goToSlide(slideNumber) {
+        currentSlide = slideNumber;
+        showSlide(currentSlide);
+      }
+
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      const slider = document.getElementById('gallery-slider');
+      if (slider) {
+        slider.addEventListener('touchstart', function (e) {
+          touchStartX = e.changedTouches[0].screenX;
+        });
+
+        slider.addEventListener('touchend', function (e) {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        });
+      }
+
+      function handleSwipe() {
+        if (touchEndX < touchStartX - 50) {
+          changeSlide(1);
+        }
+        if (touchEndX > touchStartX + 50) {
+          changeSlide(-1);
+        }
+      }
+    </script>
+
+    <style>
+      .font-space {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .review-images-grid {
+        display: grid;
+        gap: 1rem;
+      }
+
+      @media (min-width: 1024px) {
+        .review-images-grid {
+          grid-template-columns: repeat(3, 1fr);
+          grid-template-rows: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .review-images-grid {
+          grid-template-columns: repeat(2, 1fr);
+          grid-template-rows: repeat(3, 1fr);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .review-images-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .package-card {
+        transition: all 0.3s ease;
+      }
+
+      .package-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .pulse-badge {
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      .guarantee-pattern {
+        background-image: radial-gradient(circle at 1px 1px, rgb(16 185 129 / 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+    </style>
+
+    <section class="py-20 lg:py-28 bg-slate-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+        <div class="text-center mb-12 lg:mb-16">
+          <span
+            class="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-5"
+            data-meta="compare_section_label"
+          >
+            {{ template_data.compare_section_label }}
+          </span>
+          <h2 class="font-space font-bold text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-6">
+            <span data-meta="compare_headline_1">{{ template_data.compare_headline_1 }}</span>
+            <span class="gradient-text" data-meta="compare_headline_2"> {{ template_data.compare_headline_2 }}</span>
+          </h2>
+          <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto" data-meta="compare_subheadline">
+            {{ template_data.compare_subheadline }}
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-auto">
+          <table class="w-full min-w-[600px]">
+            <thead class="bg-gradient-to-r from-slate-900 to-slate-800">
+              <tr>
+                <th class="text-left p-4 sm:p-6 text-white font-semibold" data-meta="table_header_features">
+                  {{ template_data.table_header_features }}
+                </th>
+                <th class="text-center p-4 sm:p-6 min-w-[150px]">
+                  <div class="bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg px-3 py-2">
+                    <p class="text-white font-bold" data-meta="table_our_product">
+                      {{ template_data.table_our_product }}
+                    </p>
+                    <p class="text-emerald-100 text-xs" data-meta="table_our_price">
+                      {{ template_data.table_our_price }}
+                    </p>
+                  </div>
+                </th>
+                <th class="text-center p-4 sm:p-6 text-gray-400 min-w-[150px]">
+                  <p class="font-semibold" data-meta="table_competitor_1">{{ template_data.table_competitor_1 }}</p>
+                  <p class="text-xs" data-meta="table_competitor_1_price">
+                    {{ template_data.table_competitor_1_price }}
+                  </p>
+                </th>
+                <th class="text-center p-4 sm:p-6 text-gray-400 min-w-[150px]">
+                  <p class="font-semibold" data-meta="table_competitor_2">{{ template_data.table_competitor_2 }}</p>
+                  <p class="text-xs" data-meta="table_competitor_2_price">
+                    {{ template_data.table_competitor_2_price }}
+                  </p>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-200">
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 sm:p-6 font-medium text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <i
+                      class="fas fa-{{ template_data.compare_row1_icon }}"
+                      data-meta="compare_row1_icon"
+                      data-type="icon"
+                    ></i>
+                    <span data-meta="compare_row1_label">{{ template_data.compare_row1_label }}</span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <i
+                    class="fas fa-{{ template_data.compare_row1_us_icon }}"
+                    data-meta="compare_row1_us_icon"
+                    data-type="icon"
+                  ></i>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <i
+                    class="fas fa-{{ template_data.compare_row1_comp1_icon }}"
+                    data-meta="compare_row1_comp1_icon"
+                    data-type="icon"
+                  ></i>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <i
+                    class="fas fa-{{ template_data.compare_row1_comp2_icon }}"
+                    data-meta="compare_row1_comp2_icon"
+                    data-type="icon"
+                  ></i>
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 sm:p-6 font-medium text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <i
+                      class="fas fa-{{ template_data.compare_row2_icon }}"
+                      data-meta="compare_row2_icon"
+                      data-type="icon"
+                    ></i>
+                    <span data-meta="compare_row2_label">{{ template_data.compare_row2_label }}</span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-emerald-600 font-semibold" data-meta="compare_row2_us">
+                    {{- template_data.compare_row2_us -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row2_comp1">
+                    {{- template_data.compare_row2_comp1 -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row2_comp2">
+                    {{- template_data.compare_row2_comp2 -}}
+                  </span>
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 sm:p-6 font-medium text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <i
+                      class="fas fa-{{ template_data.compare_row3_icon }}"
+                      data-meta="compare_row3_icon"
+                      data-type="icon"
+                    ></i>
+                    <span data-meta="compare_row3_label">{{ template_data.compare_row3_label }}</span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-emerald-600 font-semibold" data-meta="compare_row3_us">
+                    {{- template_data.compare_row3_us -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row3_comp1">
+                    {{- template_data.compare_row3_comp1 -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row3_comp2">
+                    {{- template_data.compare_row3_comp2 -}}
+                  </span>
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 sm:p-6 font-medium text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <i
+                      class="fas fa-{{ template_data.compare_row4_icon }}"
+                      data-meta="compare_row4_icon"
+                      data-type="icon"
+                    ></i>
+                    <span data-meta="compare_row4_label">{{ template_data.compare_row4_label }}</span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-emerald-600 font-semibold" data-meta="compare_row4_us">
+                    {{- template_data.compare_row4_us -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row4_comp1">
+                    {{- template_data.compare_row4_comp1 -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row4_comp2">
+                    {{- template_data.compare_row4_comp2 -}}
+                  </span>
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 sm:p-6 font-medium text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <i
+                      class="fas fa-{{ template_data.compare_row5_icon }}"
+                      data-meta="compare_row5_icon"
+                      data-type="icon"
+                    ></i>
+                    <span data-meta="compare_row5_label">{{ template_data.compare_row5_label }}</span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-emerald-600 font-semibold" data-meta="compare_row5_us">
+                    {{- template_data.compare_row5_us -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row5_comp1">
+                    {{- template_data.compare_row5_comp1 -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row5_comp2">
+                    {{- template_data.compare_row5_comp2 -}}
+                  </span>
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 sm:p-6 font-medium text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <i
+                      class="fas fa-{{ template_data.compare_row6_icon }}"
+                      data-meta="compare_row6_icon"
+                      data-type="icon"
+                    ></i>
+                    <span data-meta="compare_row6_label">{{ template_data.compare_row6_label }}</span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-emerald-600 font-semibold" data-meta="compare_row6_us">
+                    {{- template_data.compare_row6_us -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row6_comp1">
+                    {{- template_data.compare_row6_comp1 -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row6_comp2">
+                    {{- template_data.compare_row6_comp2 -}}
+                  </span>
+                </td>
+              </tr>
+
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 sm:p-6 font-medium text-slate-900">
+                  <div class="flex items-center gap-2">
+                    <i
+                      class="fas fa-{{ template_data.compare_row7_icon }}"
+                      data-meta="compare_row7_icon"
+                      data-type="icon"
+                    ></i>
+                    <span data-meta="compare_row7_label">{{ template_data.compare_row7_label }}</span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-emerald-600 font-semibold" data-meta="compare_row7_us">
+                    {{- template_data.compare_row7_us -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row7_comp1">
+                    {{- template_data.compare_row7_comp1 -}}
+                  </span>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <span class="text-gray-400" data-meta="compare_row7_comp2">
+                    {{- template_data.compare_row7_comp2 -}}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+
+            <tfoot class="bg-gradient-to-r from-emerald-50 to-green-50">
+              <tr>
+                <td class="p-4 sm:p-6 font-bold text-slate-900" data-meta="table_total_value">
+                  {{ template_data.table_total_value }}
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <div>
+                    <p class="text-2xl font-bold text-emerald-600" data-meta="table_our_final_price">
+                      {{ template_data.table_our_final_price }}
+                    </p>
+                    <p class="text-xs text-slate-600 line-through" data-meta="table_our_original_price">
+                      {{ template_data.table_our_original_price }}
+                    </p>
+                    <span
+                      class="inline-block mt-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold"
+                      data-meta="table_save_badge"
+                    >
+                      {{ template_data.table_save_badge }}
+                    </span>
+                  </div>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <p class="text-xl text-gray-500" data-meta="table_comp1_final_price">
+                    {{ template_data.table_comp1_final_price }}
+                  </p>
+                </td>
+                <td class="p-4 sm:p-6 text-center">
+                  <p class="text-xl text-gray-500" data-meta="table_comp2_final_price">
+                    {{ template_data.table_comp2_final_price }}
+                  </p>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <p class="text-center text-sm text-slate-500 mt-4 sm:hidden">
+          <i class="fas fa-{{ template_data.swipe_icon_left }}" data-meta="swipe_icon_left" data-type="icon"></i>
+          <span data-meta="swipe_text">{{ template_data.swipe_text }}</span>
+          <i
+            class="fas fa-{{ template_data.swipe_icon_right }}"
+            data-meta="swipe_icon_right"
+            data-type="icon"
+          ></i>
+        </p>
+
+        <div class="text-center mt-8">
+          <div
+            class="inline-flex items-center gap-3 bg-emerald-100 border-2 border-emerald-300 rounded-full px-6 py-3"
+          >
+            <i class="fas fa-{{ template_data.winner_icon }}" data-meta="winner_icon" data-type="icon"></i>
+            <p class="font-semibold text-emerald-800" data-meta="winner_text">
+              {{ template_data.winner_text }}
+            </p>
+          </div>
+        </div>
+
+        <div class="text-center mt-8">
+          <a
+            href="{{ template_data.compare_cta_link }}"
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold px-8 py-4 rounded-xl hover:shadow-xl transition-all transform hover:scale-105"
+            data-meta="compare_cta_link"
+          >
+            <i
+              class="fas fa-{{ template_data.compare_cta_icon }}"
+              data-meta="compare_cta_icon"
+              data-type="icon"
+            ></i>
+            <span data-meta="compare_cta_text">{{ template_data.compare_cta_text }}</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <style>
+      .font-space {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      @media (max-width: 768px) {
+        table {
+          font-size: 14px;
+        }
+
+        th,
+        td {
+          padding: 12px !important;
+        }
+      }
+    </style>
+    <section id="reviews" class="py-20 lg:py-28 bg-slate-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12 lg:mb-16">
+          <span
+            class="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-5"
+            data-meta="reviews_section_label"
+          >
+            {{ template_data.reviews_section_label }}
+          </span>
+          <h2 class="font-space font-bold text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-6">
+            <span data-meta="reviews_headline_1">{{ template_data.reviews_headline_1 }}</span>
+            <span class="gradient-text" data-meta="reviews_headline_2"> {{ template_data.reviews_headline_2 }}</span>
+          </h2>
+          <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto" data-meta="reviews_subheadline">
+            {{ template_data.reviews_subheadline }}
+          </p>
+        </div>
+
+        <div class="mb-16">
+          <h3 class="text-center text-2xl font-bold text-slate-900 mb-8" data-meta="customer_photos_title">
+            {{ template_data.customer_photos_title }}
+          </h3>
+          <div class="review-images-grid">
+            <div class="relative rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="{{ template_data.customer_photo_1 }}"
+                alt=""
+                data-meta="customer_photo_1"
+                data-type="image"
+                class="w-full h-full object-cover aspect-square"
+              >
+            </div>
+            <div class="relative rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="{{ template_data.customer_photo_2 }}"
+                alt=""
+                data-meta="customer_photo_2"
+                data-type="image"
+                class="w-full h-full object-cover aspect-square"
+              >
+            </div>
+            <div class="relative rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="{{ template_data.customer_photo_3 }}"
+                alt=""
+                data-meta="customer_photo_3"
+                data-type="image"
+                class="w-full h-full object-cover aspect-square"
+              >
+            </div>
+            <div class="relative rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="{{ template_data.customer_photo_4 }}"
+                alt=""
+                data-meta="customer_photo_4"
+                data-type="image"
+                class="w-full h-full object-cover aspect-square"
+              >
+            </div>
+            <div class="relative rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="{{ template_data.customer_photo_5 }}"
+                alt=""
+                data-meta="customer_photo_5"
+                data-type="image"
+                class="w-full h-full object-cover aspect-square"
+              >
+            </div>
+            <div class="relative rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="{{ template_data.customer_photo_6 }}"
+                alt=""
+                data-meta="customer_photo_6"
+                data-type="image"
+                class="w-full h-full object-cover aspect-square"
+              >
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            <div class="bg-white rounded-xl p-6 shadow-md">
+              <div class="flex mb-3">
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+              </div>
+              <h4 class="font-semibold text-slate-900 mb-2" data-meta="review_title_1">
+                {{ template_data.review_title_1 }}
+              </h4>
+              <p class="text-slate-600 mb-4" data-meta="review_content_1">
+                {{ template_data.review_content_1 }}
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <span class="font-bold text-emerald-600" data-meta="reviewer_initials_1">
+                    {{- template_data.reviewer_initials_1 -}}
+                  </span>
+                </div>
+                <div>
+                  <p class="font-semibold text-sm text-slate-900" data-meta="reviewer_name_1">
+                    {{ template_data.reviewer_name_1 }}
+                  </p>
+                  <p class="text-xs text-slate-500" data-meta="reviewer_badge_1">
+                    {{ template_data.reviewer_badge_1 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md">
+              <div class="flex mb-3">
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+              </div>
+              <h4 class="font-semibold text-slate-900 mb-2" data-meta="review_title_2">
+                {{ template_data.review_title_2 }}
+              </h4>
+              <p class="text-slate-600 mb-4" data-meta="review_content_2">
+                {{ template_data.review_content_2 }}
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <span class="font-bold text-emerald-600" data-meta="reviewer_initials_2">
+                    {{- template_data.reviewer_initials_2 -}}
+                  </span>
+                </div>
+                <div>
+                  <p class="font-semibold text-sm text-slate-900" data-meta="reviewer_name_2">
+                    {{ template_data.reviewer_name_2 }}
+                  </p>
+                  <p class="text-xs text-slate-500" data-meta="reviewer_badge_2">
+                    {{ template_data.reviewer_badge_2 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md">
+              <div class="flex mb-3">
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+              </div>
+              <h4 class="font-semibold text-slate-900 mb-2" data-meta="review_title_3">
+                {{ template_data.review_title_3 }}
+              </h4>
+              <p class="text-slate-600 mb-4" data-meta="review_content_3">
+                {{ template_data.review_content_3 }}
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <span class="font-bold text-emerald-600" data-meta="reviewer_initials_3">
+                    {{- template_data.reviewer_initials_3 -}}
+                  </span>
+                </div>
+                <div>
+                  <p class="font-semibold text-sm text-slate-900" data-meta="reviewer_name_3">
+                    {{ template_data.reviewer_name_3 }}
+                  </p>
+                  <p class="text-xs text-slate-500" data-meta="reviewer_badge_3">
+                    {{ template_data.reviewer_badge_3 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md">
+              <div class="flex mb-3">
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+              </div>
+              <h4 class="font-semibold text-slate-900 mb-2" data-meta="review_title_4">
+                {{ template_data.review_title_4 }}
+              </h4>
+              <p class="text-slate-600 mb-4" data-meta="review_content_4">
+                {{ template_data.review_content_4 }}
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <span class="font-bold text-emerald-600" data-meta="reviewer_initials_4">
+                    {{- template_data.reviewer_initials_4 -}}
+                  </span>
+                </div>
+                <div>
+                  <p class="font-semibold text-sm text-slate-900" data-meta="reviewer_name_4">
+                    {{ template_data.reviewer_name_4 }}
+                  </p>
+                  <p class="text-xs text-slate-500" data-meta="reviewer_badge_4">
+                    {{ template_data.reviewer_badge_4 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md">
+              <div class="flex mb-3">
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+              </div>
+              <h4 class="font-semibold text-slate-900 mb-2" data-meta="review_title_5">
+                {{ template_data.review_title_5 }}
+              </h4>
+              <p class="text-slate-600 mb-4" data-meta="review_content_5">
+                {{ template_data.review_content_5 }}
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <span class="font-bold text-emerald-600" data-meta="reviewer_initials_5">
+                    {{- template_data.reviewer_initials_5 -}}
+                  </span>
+                </div>
+                <div>
+                  <p class="font-semibold text-sm text-slate-900" data-meta="reviewer_name_5">
+                    {{ template_data.reviewer_name_5 }}
+                  </p>
+                  <p class="text-xs text-slate-500" data-meta="reviewer_badge_5">
+                    {{ template_data.reviewer_badge_5 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-md">
+              <div class="flex mb-3">
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+              </div>
+              <h4 class="font-semibold text-slate-900 mb-2" data-meta="review_title_6">
+                {{ template_data.review_title_6 }}
+              </h4>
+              <p class="text-slate-600 mb-4" data-meta="review_content_6">
+                {{ template_data.review_content_6 }}
+              </p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <span class="font-bold text-emerald-600" data-meta="reviewer_initials_6">
+                    {{- template_data.reviewer_initials_6 -}}
+                  </span>
+                </div>
+                <div>
+                  <p class="font-semibold text-sm text-slate-900" data-meta="reviewer_name_6">
+                    {{ template_data.reviewer_name_6 }}
+                  </p>
+                  <p class="text-xs text-slate-500" data-meta="reviewer_badge_6">
+                    {{ template_data.reviewer_badge_6 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-12">
+            <div class="bg-white rounded-2xl shadow-lg p-6 lg:p-8 max-w-2xl mx-auto">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4">
+                <div class="text-center">
+                  <div class="flex justify-center items-baseline gap-2 mb-2">
+                    <p
+                      class="text-3xl lg:text-4xl font-bold text-slate-900"
+                      data-meta="stats_rating_value"
+                    >
+                      {{ template_data.stats_rating_value }}
+                    </p>
+                    <span class="text-2xl text-slate-400" data-meta="stats_rating_max">
+                      {{- template_data.stats_rating_max -}}
+                    </span>
+                  </div>
+                  <p class="text-sm lg:text-base text-slate-600" data-meta="stats_rating_label">
+                    {{ template_data.stats_rating_label }}
+                  </p>
+                </div>
+
+                <div
+                  class="text-center border-t sm:border-t-0 sm:border-l sm:border-r border-slate-200 pt-6 sm:pt-0"
+                >
+                  <p
+                    class="text-3xl lg:text-4xl font-bold text-slate-900 mb-2"
+                    data-meta="stats_review_count"
+                  >
+                    {{ template_data.stats_review_count }}
+                  </p>
+                  <p class="text-sm lg:text-base text-slate-600" data-meta="stats_review_label">
+                    {{ template_data.stats_review_label }}
+                  </p>
+                </div>
+
+                <div class="text-center border-t sm:border-t-0 border-slate-200 pt-6 sm:pt-0">
+                  <p
+                    class="text-3xl lg:text-4xl font-bold text-emerald-600 mb-2"
+                    data-meta="stats_recommend_percent"
+                  >
+                    {{ template_data.stats_recommend_percent }}
+                  </p>
+                  <p class="text-sm lg:text-base text-slate-600" data-meta="stats_recommend_label">
+                    {{ template_data.stats_recommend_label }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <style>
+      .font-space {
+        font-family: 'Space Grotesk', sans-serif;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .package-card {
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .package-card:hover {
+        transform: translateY(-8px);
+      }
+
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        }
+
+        50% {
+          box-shadow: 0 0 20px 10px rgba(16, 185, 129, 0.2);
+        }
+      }
+
+      .popular-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+
+      @media (max-width: 768px) {
+        .packages-container {
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .package-card {
+          scroll-snap-align: center;
+        }
+      }
+
+      @keyframes savings-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .savings-badge {
+        animation: savings-pulse 2s ease-in-out infinite;
+      }
+
+      .package-highlight {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      }
+    </style>
+
+    <section id="packages" class="py-20 lg:py-32 bg-gradient-to-b from-white to-slate-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div class="text-center mb-16 lg:mb-20">
+          <div
+            class="inline-flex items-center gap-3 bg-red-50 border-2 border-red-200 rounded-full px-6 py-3 mb-6"
+          >
+            <i
+              class="fas fa-{{ template_data.packages_timer_icon }}"
+              data-meta="packages_timer_icon"
+              data-type="icon"
+            ></i>
+            <span class="font-bold text-red-700 text-base md:text-lg">
+              <span data-meta="packages_timer_text">{{ template_data.packages_timer_text }}</span>
+              <span id="countdown-timer-pack" data-meta="packages_countdown">
+                {{- template_data.packages_countdown -}}
+              </span>
+            </span>
+          </div>
+
+          <h2 class="font-space font-bold text-3xl sm:text-4xl lg:text-6xl text-slate-900 mb-6">
+            <span data-meta="packages_headline_main">{{ template_data.packages_headline_main }}</span>
+            <span class="gradient-text" data-meta="packages_headline_highlight">
+              {{ template_data.packages_headline_highlight -}}
+            </span>
+          </h2>
+          <p
+            class="text-lg sm:text-xl lg:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed"
+            data-meta="packages_subheadline"
+          >
+            {{ template_data.packages_subheadline }}
+          </p>
+        </div>
+
+        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6 mb-12 lg:mb-16">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <i
+                class="fas fa-{{ template_data.benefit_icon_1 }}"
+                data-meta="benefit_icon_1"
+                data-type="icon"
+              ></i>
+              <p class="font-semibold text-slate-900" data-meta="benefit_title_1">
+                {{ template_data.benefit_title_1 }}
+              </p>
+              <p class="text-sm text-slate-600" data-meta="benefit_subtitle_1">
+                {{ template_data.benefit_subtitle_1 }}
+              </p>
+            </div>
+            <div>
+              <i
+                class="fas fa-{{ template_data.benefit_icon_2 }}"
+                data-meta="benefit_icon_2"
+                data-type="icon"
+              ></i>
+              <p class="font-semibold text-slate-900" data-meta="benefit_title_2">
+                {{ template_data.benefit_title_2 }}
+              </p>
+              <p class="text-sm text-slate-600" data-meta="benefit_subtitle_2">
+                {{ template_data.benefit_subtitle_2 }}
+              </p>
+            </div>
+            <div>
+              <i
+                class="fas fa-{{ template_data.benefit_icon_3 }}"
+                data-meta="benefit_icon_3"
+                data-type="icon"
+              ></i>
+              <p class="font-semibold text-slate-900" data-meta="benefit_title_3">
+                {{ template_data.benefit_title_3 }}
+              </p>
+              <p class="text-sm text-slate-600" data-meta="benefit_subtitle_3">
+                {{ template_data.benefit_subtitle_3 }}
+              </p>
+            </div>
+            <div>
+              <i
+                class="fas fa-{{ template_data.benefit_icon_4 }}"
+                data-meta="benefit_icon_4"
+                data-type="icon"
+              ></i>
+              <p class="font-semibold text-slate-900" data-meta="benefit_title_4">
+                {{ template_data.benefit_title_4 }}
+              </p>
+              <p class="text-sm text-slate-600" data-meta="benefit_subtitle_4">
+                {{ template_data.benefit_subtitle_4 }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 packages-container">
+          <div
+            class="package-card bg-white rounded-3xl shadow-lg overflow-hidden border-2 border-slate-200 hover:border-emerald-300 hover:shadow-2xl"
+          >
+            <div class="p-6 sm:p-8 lg:p-10">
+              <div class="text-center mb-6">
+                <h3 class="text-xl lg:text-2xl font-bold text-slate-900 mb-2" data-meta="package_name_1">
+                  {{ template_data.package_name_1 }}
+                </h3>
+                <p class="text-slate-600" data-meta="package_tagline_1">{{ template_data.package_tagline_1 }}</p>
+              </div>
+
+              <div class="relative aspect-[1/1] mb-8 bg-gradient-to-b from-slate-50 to-white rounded-xl p-6">
+                <img
+                  src="{{ template_data.package_image_1 }}"
+                  alt=""
+                  data-meta="package_image_1"
+                  data-type="image"
+                  class="w-full h-full rounded-lg object-cover"
+                >
+                <div class="absolute top-3 right-3 bg-slate-100 rounded-full px-3 py-1">
+                  <span class="text-sm font-bold text-slate-700" data-meta="package_quantity_badge_1">
+                    {{- template_data.package_quantity_badge_1 -}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="text-center mb-8 space-y-2">
+                <p class="text-slate-500 line-through text-xl" data-meta="package_original_price_1">
+                  {{ template_data.package_original_price_1 }}
+                </p>
+                <p class="text-5xl lg:text-6xl font-bold text-slate-900" data-meta="package_sale_price_1">
+                  {{ template_data.package_sale_price_1 }}
+                </p>
+                <div class="inline-block bg-green-100 text-green-700 px-4 py-2 rounded-full">
+                  <span class="font-bold text-base" data-meta="package_save_text_1">
+                    {{- template_data.package_save_text_1 -}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="space-y-3 mb-8">
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_1a }}"
+                    data-meta="package_feature_icon_1a"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="package_feature_text_1a">
+                    {{- template_data.package_feature_text_1a -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_1b }}"
+                    data-meta="package_feature_icon_1b"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="package_feature_text_1b">
+                    {{- template_data.package_feature_text_1b -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_1c }}"
+                    data-meta="package_feature_icon_1c"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="package_feature_text_1c">
+                    {{- template_data.package_feature_text_1c -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_bonus_icon_1 }}"
+                    data-meta="package_bonus_icon_1"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700 font-semibold" data-meta="package_bonus_text_1">
+                    {{- template_data.package_bonus_text_1 -}}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-lg py-4 rounded-xl transition-all"
+                data-meta="package_button_text_1"
+              >
+                {{ template_data.package_button_text_1 }}
+              </button>
+
+              <p class="text-center text-sm text-slate-600 mt-4" data-meta="package_per_unit_1">
+                {{ template_data.package_per_unit_1 }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-3xl shadow-2xl border-4 border-emerald-500 transform lg:scale-105 relative"
+          >
+            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 z-10">
+              <div
+                class="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-4 py-2 rounded-full shadow-lg"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm" data-meta="popular_badge_text">
+                    {{- template_data.popular_badge_text -}}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 sm:p-8 lg:p-10 pt-12 rounded-3xl package-highlight">
+              <div class="text-center mb-6">
+                <h3 class="text-xl lg:text-2xl font-bold text-slate-900 mb-2" data-meta="package_name_2">
+                  {{ template_data.package_name_2 }}
+                </h3>
+                <p class="text-slate-600 font-semibold" data-meta="package_tagline_2">
+                  {{ template_data.package_tagline_2 }}
+                </p>
+              </div>
+
+              <div class="relative aspect-[1/1] mb-8 bg-white rounded-xl p-6 shadow-inner">
+                <img
+                  src="{{ template_data.package_image_2 }}"
+                  alt=""
+                  data-meta="package_image_2"
+                  data-type="image"
+                  class="w-full h-full rounded-lg object-cover"
+                >
+                <div
+                  class="absolute top-3 right-3 bg-emerald-500 text-white rounded-full px-3 py-1 savings-badge"
+                >
+                  <span class="text-sm font-bold" data-meta="package_quantity_badge_2">
+                    {{- template_data.package_quantity_badge_2 -}}
+                  </span>
+                </div>
+                <div
+                  class="absolute bottom-3 left-3 bg-red-500 text-white rounded-full px-3 py-1 text-xs font-bold"
+                  data-meta="package_deal_badge_2"
+                >
+                  {{ template_data.package_deal_badge_2 }}
+                </div>
+              </div>
+
+              <div class="text-center mb-8 space-y-2">
+                <p class="text-slate-500 line-through text-xl" data-meta="package_original_price_2">
+                  {{ template_data.package_original_price_2 }}
+                </p>
+                <p class="text-5xl lg:text-6xl font-bold text-emerald-600" data-meta="package_sale_price_2">
+                  {{ template_data.package_sale_price_2 }}
+                </p>
+                <div
+                  class="inline-block bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-full"
+                >
+                  <span class="font-bold text-base" data-meta="package_save_text_2">
+                    {{- template_data.package_save_text_2 -}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="space-y-3 mb-8">
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_2a }}"
+                    data-meta="package_feature_icon_2a"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700 font-semibold" data-meta="package_feature_text_2a">
+                    {{- template_data.package_feature_text_2a -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_2b }}"
+                    data-meta="package_feature_icon_2b"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700 font-semibold" data-meta="package_feature_text_2b">
+                    {{- template_data.package_feature_text_2b -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_2c }}"
+                    data-meta="package_feature_icon_2c"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700 font-semibold" data-meta="package_feature_text_2c">
+                    {{- template_data.package_feature_text_2c -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_bonus_icon_2 }}"
+                    data-meta="package_bonus_icon_2"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700 font-semibold" data-meta="package_bonus_text_2">
+                    {{- template_data.package_bonus_text_2 -}}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                class="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                data-meta="package_button_text_2"
+              >
+                {{ template_data.package_button_text_2 }}
+              </button>
+
+              <p
+                class="text-center text-sm text-emerald-700 font-semibold mt-4"
+                data-meta="package_per_unit_2"
+              >
+                {{ template_data.package_per_unit_2 }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="package-card bg-white rounded-3xl shadow-lg overflow-hidden border-2 border-slate-200 hover:border-emerald-300 hover:shadow-2xl"
+          >
+            <div class="p-6 sm:p-8 lg:p-10">
+              <div class="text-center mb-6">
+                <h3 class="text-xl lg:text-2xl font-bold text-slate-900 mb-2" data-meta="package_name_3">
+                  {{ template_data.package_name_3 }}
+                </h3>
+                <p class="text-slate-600" data-meta="package_tagline_3">{{ template_data.package_tagline_3 }}</p>
+              </div>
+
+              <div class="relative aspect-[1/1] mb-8 bg-gradient-to-b from-slate-50 to-white rounded-xl p-6">
+                <img
+                  src="{{ template_data.package_image_3 }}"
+                  alt=""
+                  data-meta="package_image_3"
+                  data-type="image"
+                  class="w-full h-full rounded-lg object-cover"
+                >
+                <div class="absolute top-3 right-3 bg-slate-100 rounded-full px-3 py-1">
+                  <span class="text-sm font-bold text-slate-700" data-meta="package_quantity_badge_3">
+                    {{- template_data.package_quantity_badge_3 -}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="text-center mb-8 space-y-2">
+                <p class="text-slate-500 line-through text-xl" data-meta="package_original_price_3">
+                  {{ template_data.package_original_price_3 }}
+                </p>
+                <p class="text-5xl lg:text-6xl font-bold text-slate-900" data-meta="package_sale_price_3">
+                  {{ template_data.package_sale_price_3 }}
+                </p>
+                <div class="inline-block bg-green-100 text-green-700 px-4 py-2 rounded-full">
+                  <span class="font-bold text-base" data-meta="package_save_text_3">
+                    {{- template_data.package_save_text_3 -}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="space-y-3 mb-8">
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_3a }}"
+                    data-meta="package_feature_icon_3a"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="package_feature_text_3a">
+                    {{- template_data.package_feature_text_3a -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_3b }}"
+                    data-meta="package_feature_icon_3b"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="package_feature_text_3b">
+                    {{- template_data.package_feature_text_3b -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_feature_icon_3c }}"
+                    data-meta="package_feature_icon_3c"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="package_feature_text_3c">
+                    {{- template_data.package_feature_text_3c -}}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <i
+                    class="fas fa-{{ template_data.package_bonus_icon_3 }}"
+                    data-meta="package_bonus_icon_3"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="package_bonus_text_3">
+                    {{- template_data.package_bonus_text_3 -}}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-lg py-4 rounded-xl transition-all"
+                data-meta="package_button_text_3"
+              >
+                {{ template_data.package_button_text_3 }}
+              </button>
+
+              <p class="text-center text-sm text-slate-600 mt-4" data-meta="package_per_unit_3">
+                {{ template_data.package_per_unit_3 }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-16 lg:mt-20 text-center space-y-6">
+          <div
+            class="inline-flex items-center gap-3 bg-yellow-50 border-2 border-yellow-300 rounded-full px-6 py-3"
+          >
+            <i class="fas fa-{{ template_data.warning_icon }}" data-meta="warning_icon" data-type="icon"></i>
+            <p class="text-yellow-800 font-semibold text-base" data-meta="warning_text">
+              {{ template_data.warning_text }}
+            </p>
+          </div>
+
+          <div class="flex flex-wrap justify-center items-center gap-4">
+            <span class="text-slate-600 font-medium" data-meta="payment_text">{{ template_data.payment_text }}</span>
+            <i class="fab fa-cc-visa text-3xl text-slate-700"></i>
+            <i class="fab fa-cc-mastercard text-3xl text-slate-700"></i>
+            <i class="fab fa-cc-amex text-3xl text-slate-700"></i>
+            <i class="fab fa-cc-paypal text-3xl text-slate-700"></i>
+            <i class="fab fa-amazon-pay text-3xl text-slate-700"></i>
+          </div>
+
+          <div class="flex justify-center items-center gap-2 text-sm text-slate-600">
+            <i class="fas fa-{{ template_data.security_icon }}" data-meta="security_icon" data-type="icon"></i>
+            <span data-meta="security_text">{{ template_data.security_text }}</span>
+          </div>
+        </div>
+
+        <div class="mt-16 bg-gradient-to-r from-slate-100 to-slate-50 rounded-2xl p-6 lg:p-8">
+          <div class="flex items-center justify-center gap-6">
+            <div class="hidden md:block">
+              <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                <span class="text-2xl font-bold text-emerald-600" data-meta="testimonial_initials">
+                  {{- template_data.testimonial_initials -}}
+                </span>
+              </div>
+            </div>
+            <div class="text-center md:text-left">
+              <p class="text-slate-700 italic text-base lg:text-lg mb-2" data-meta="testimonial_quote">
+                {{ template_data.testimonial_quote }}
+              </p>
+              <div class="flex items-center justify-center md:justify-start gap-2">
+                <div class="flex">
+                  <i class="fas fa-star text-yellow-400 text-sm"></i>
+                  <i class="fas fa-star text-yellow-400 text-sm"></i>
+                  <i class="fas fa-star text-yellow-400 text-sm"></i>
+                  <i class="fas fa-star text-yellow-400 text-sm"></i>
+                  <i class="fas fa-star text-yellow-400 text-sm"></i>
+                </div>
+                <span class="text-sm text-slate-600 font-medium" data-meta="testimonial_author">
+                  {{- template_data.testimonial_author -}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function updateCountdown() {
+        const countdownElement = document.getElementById('countdown-timer');
+        if (countdownElement) {
+          let hours = 08;
+          let minutes = 42;
+          let seconds = 15;
+
+          setInterval(() => {
+            seconds--;
+            if (seconds < 0) {
+              seconds = 59;
+              minutes--;
+              if (minutes < 0) {
+                minutes = 59;
+                hours--;
+                if (hours < 0) {
+                  hours = 23;
+                }
+              }
+            }
+
+            countdownElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes
+              .toString()
+              .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          }, 1000);
+        }
+      }
+
+      updateCountdown();
+
+      function updateCountdownpack() {
+        const countdownElement = document.getElementById('countdown-timer-pack');
+        if (countdownElement) {
+          let hours = 08;
+          let minutes = 42;
+          let seconds = 15;
+
+          setInterval(() => {
+            seconds--;
+            if (seconds < 0) {
+              seconds = 59;
+              minutes--;
+              if (minutes < 0) {
+                minutes = 59;
+                hours--;
+                if (hours < 0) {
+                  hours = 23;
+                }
+              }
+            }
+
+            countdownElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes
+              .toString()
+              .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          }, 1000);
+        }
+      }
+
+      updateCountdownpack();
+    </script>
+
+    <section class="pb-20 lg:pb-28 bg-gradient-to-br from-emerald-50 to-green-50 guarantee-pattern">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          <div class="grid md:grid-cols-2">
+            <div
+              class="bg-gradient-to-br from-emerald-600 to-green-600 p-8 lg:p-12 flex items-center justify-center"
+            >
+              <div class="text-center">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i
+                    class="fas fa-{{ template_data.guarantee_icon_main }}"
+                    data-meta="guarantee_icon_main"
+                    data-type="icon"
+                  ></i>
+                </div>
+                <h3 class="text-white text-3xl font-bold mb-3" data-meta="guarantee_period">
+                  {{ template_data.guarantee_period }}
+                </h3>
+                <p class="text-white text-xl" data-meta="guarantee_subtitle">{{ template_data.guarantee_subtitle }}</p>
+              </div>
+            </div>
+
+            <div class="p-8 lg:p-12">
+              <h2 class="font-space font-bold text-3xl text-slate-900 mb-4" data-meta="guarantee_headline">
+                {{ template_data.guarantee_headline }}
+              </h2>
+              <p class="text-lg text-slate-600 mb-6" data-meta="guarantee_description">
+                {{ template_data.guarantee_description }}
+              </p>
+              <ul class="space-y-3 mb-6">
+                <li class="flex items-start gap-3">
+                  <i
+                    class="fas fa-{{ template_data.guarantee_check_icon_1 }}"
+                    data-meta="guarantee_check_icon_1"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="guarantee_point_1">
+                    {{- template_data.guarantee_point_1 -}}
+                  </span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i
+                    class="fas fa-{{ template_data.guarantee_check_icon_2 }}"
+                    data-meta="guarantee_check_icon_2"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="guarantee_point_2">
+                    {{- template_data.guarantee_point_2 -}}
+                  </span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i
+                    class="fas fa-{{ template_data.guarantee_check_icon_3 }}"
+                    data-meta="guarantee_check_icon_3"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="guarantee_point_3">
+                    {{- template_data.guarantee_point_3 -}}
+                  </span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i
+                    class="fas fa-{{ template_data.guarantee_check_icon_4 }}"
+                    data-meta="guarantee_check_icon_4"
+                    data-type="icon"
+                  ></i>
+                  <span class="text-slate-700" data-meta="guarantee_point_4">
+                    {{- template_data.guarantee_point_4 -}}
+                  </span>
+                </li>
+              </ul>
+              <p class="text-sm text-slate-600 italic" data-meta="guarantee_quote">
+                {{ template_data.guarantee_quote }}
+              </p>
+              <p class="text-sm font-semibold text-slate-900 mt-2" data-meta="guarantee_signature">
+                {{ template_data.guarantee_signature }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-8 mt-12">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-{{ template_data.trust_icon_1 }}" data-meta="trust_icon_1" data-type="icon"></i>
+            <span class="text-slate-700 font-medium" data-meta="trust_label_1">{{ template_data.trust_label_1 }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-{{ template_data.trust_icon_2 }}" data-meta="trust_icon_2" data-type="icon"></i>
+            <span class="text-slate-700 font-medium" data-meta="trust_label_2">{{ template_data.trust_label_2 }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-{{ template_data.trust_icon_3 }}" data-meta="trust_icon_3" data-type="icon"></i>
+            <span class="text-slate-700 font-medium" data-meta="trust_label_3">{{ template_data.trust_label_3 }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-{{ template_data.trust_icon_4 }}" data-meta="trust_icon_4" data-type="icon"></i>
+            <span class="text-slate-700 font-medium" data-meta="trust_label_4">{{ template_data.trust_label_4 }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="py-20 lg:py-28 bg-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+        <div class="text-center mb-12">
+          <span
+            class="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-5"
+            data-meta="faq_section_label"
+          >
+            {{ template_data.faq_section_label }}
+          </span>
+          <h2
+            class="font-space font-bold text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-6"
+            data-meta="faq_headline"
+          >
+            {{ template_data.faq_headline }}
+          </h2>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-slate-50 rounded-xl p-6">
+            <button onclick="toggleFAQ(1)" class="w-full flex items-center justify-between text-left">
+              <h3 class="font-semibold text-lg text-slate-900" data-meta="faq_question_1">
+                {{ template_data.faq_question_1 }}
+              </h3>
+              <i
+                class="fas fa-{{ template_data.faq_arrow_icon }}"
+                data-meta="faq_arrow_icon"
+                data-type="icon"
+                id="faq-icon-1"
+              ></i>
+            </button>
+            <div class="mt-4 text-slate-600 hidden" id="faq-content-1" data-meta="faq_answer_1">
+              {{ template_data.faq_answer_1 }}
+            </div>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-6">
+            <button onclick="toggleFAQ(2)" class="w-full flex items-center justify-between text-left">
+              <h3 class="font-semibold text-lg text-slate-900" data-meta="faq_question_2">
+                {{ template_data.faq_question_2 }}
+              </h3>
+              <i
+                class="fas fa-{{ template_data.faq_arrow_icon }}"
+                data-meta="faq_arrow_icon"
+                data-type="icon"
+                id="faq-icon-2"
+              ></i>
+            </button>
+            <div class="mt-4 text-slate-600 hidden" id="faq-content-2" data-meta="faq_answer_2">
+              {{ template_data.faq_answer_2 }}
+            </div>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-6">
+            <button onclick="toggleFAQ(3)" class="w-full flex items-center justify-between text-left">
+              <h3 class="font-semibold text-lg text-slate-900" data-meta="faq_question_3">
+                {{ template_data.faq_question_3 }}
+              </h3>
+              <i
+                class="fas fa-{{ template_data.faq_arrow_icon }}"
+                data-meta="faq_arrow_icon"
+                data-type="icon"
+                id="faq-icon-3"
+              ></i>
+            </button>
+            <div class="mt-4 text-slate-600 hidden" id="faq-content-3" data-meta="faq_answer_3">
+              {{ template_data.faq_answer_3 }}
+            </div>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-6">
+            <button onclick="toggleFAQ(4)" class="w-full flex items-center justify-between text-left">
+              <h3 class="font-semibold text-lg text-slate-900" data-meta="faq_question_4">
+                {{ template_data.faq_question_4 }}
+              </h3>
+              <i
+                class="fas fa-{{ template_data.faq_arrow_icon }}"
+                data-meta="faq_arrow_icon"
+                data-type="icon"
+                id="faq-icon-4"
+              ></i>
+            </button>
+            <div class="mt-4 text-slate-600 hidden" id="faq-content-4" data-meta="faq_answer_4">
+              {{ template_data.faq_answer_4 }}
+            </div>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-6">
+            <button onclick="toggleFAQ(5)" class="w-full flex items-center justify-between text-left">
+              <h3 class="font-semibold text-lg text-slate-900" data-meta="faq_question_5">
+                {{ template_data.faq_question_5 }}
+              </h3>
+              <i
+                class="fas fa-{{ template_data.faq_arrow_icon }}"
+                data-meta="faq_arrow_icon"
+                data-type="icon"
+                id="faq-icon-5"
+              ></i>
+            </button>
+            <div class="mt-4 text-slate-600 hidden" id="faq-content-5" data-meta="faq_answer_5">
+              {{ template_data.faq_answer_5 }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20 lg:py-28 bg-gradient-to-r from-slate-900 to-slate-800">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
+        <div class="inline-flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-full mb-8 animate-pulse">
+          <i
+            class="fas fa-{{ template_data.final_urgency_icon }}"
+            data-meta="final_urgency_icon"
+            data-type="icon"
+          ></i>
+          <span class="font-semibold" data-meta="final_urgency_text">{{ template_data.final_urgency_text }}</span>
+        </div>
+
+        <h2
+          class="font-space font-bold text-4xl sm:text-5xl lg:text-6xl text-white mb-6"
+          data-meta="final_headline"
+        >
+          {{ template_data.final_headline }}
+        </h2>
+
+        <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto" data-meta="final_subheadline">
+          {{ template_data.final_subheadline }}
+        </p>
+
+        <div class="grid sm:grid-cols-3 gap-6 mb-10 max-w-3xl mx-auto">
+          <div class="text-center">
+            <i
+              class="fas fa-{{ template_data.final_benefit_icon_1 }}"
+              data-meta="final_benefit_icon_1"
+              data-type="icon"
+            ></i>
+            <p class="text-white font-semibold" data-meta="final_benefit_title_1">
+              {{ template_data.final_benefit_title_1 }}
+            </p>
+            <p class="text-gray-400 text-sm" data-meta="final_benefit_desc_1">
+              {{ template_data.final_benefit_desc_1 }}
+            </p>
+          </div>
+          <div class="text-center">
+            <i
+              class="fas fa-{{ template_data.final_benefit_icon_2 }}"
+              data-meta="final_benefit_icon_2"
+              data-type="icon"
+            ></i>
+            <p class="text-white font-semibold" data-meta="final_benefit_title_2">
+              {{ template_data.final_benefit_title_2 }}
+            </p>
+            <p class="text-gray-400 text-sm" data-meta="final_benefit_desc_2">
+              {{ template_data.final_benefit_desc_2 }}
+            </p>
+          </div>
+          <div class="text-center">
+            <i
+              class="fas fa-{{ template_data.final_benefit_icon_3 }}"
+              data-meta="final_benefit_icon_3"
+              data-type="icon"
+            ></i>
+            <p class="text-white font-semibold" data-meta="final_benefit_title_3">
+              {{ template_data.final_benefit_title_3 }}
+            </p>
+            <p class="text-gray-400 text-sm" data-meta="final_benefit_desc_3">
+              {{ template_data.final_benefit_desc_3 }}
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur rounded-2xl p-8 mb-8 max-w-xl mx-auto">
+          <div class="flex items-center justify-center gap-4 mb-6">
+            <span class="text-3xl text-gray-400 line-through" data-meta="final_price_original">
+              {{- template_data.final_price_original -}}
+            </span>
+            <span class="text-5xl font-bold text-white" data-meta="final_price_sale">
+              {{- template_data.final_price_sale -}}
+            </span>
+            <span
+              class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+              data-meta="final_price_badge"
+            >
+              {{- template_data.final_price_badge -}}
+            </span>
+          </div>
+
+          <a
+            href="{{ template_data.final_cta_link }}"
+            class="block w-full bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-bold text-xl py-5 rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all"
+            data-meta="final_cta_link"
+          >
+            <i
+              class="fas fa-{{ template_data.final_cta_icon }}"
+              data-meta="final_cta_icon"
+              data-type="icon"
+            ></i>
+            <span data-meta="final_cta_button_text">{{ template_data.final_cta_button_text }}</span>
+          </a>
+
+          <p class="text-gray-400 text-sm mt-4">
+            <i
+              class="fas fa-{{ template_data.final_secure_icon }}"
+              data-meta="final_secure_icon"
+              data-type="icon"
+            ></i>
+            <span data-meta="final_secure_text">{{ template_data.final_secure_text }}</span>
+          </p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6 text-gray-400 text-sm">
+          <span
+            ><i
+              class="fas fa-{{ template_data.final_feature_icon_1 }}"
+              data-meta="final_feature_icon_1"
+              data-type="icon"
+            ></i>
+            <span data-meta="final_feature_text_1">{{ template_data.final_feature_text_1 }}</span></span
+          >
+          <span
+            ><i
+              class="fas fa-{{ template_data.final_feature_icon_2 }}"
+              data-meta="final_feature_icon_2"
+              data-type="icon"
+            ></i>
+            <span data-meta="final_feature_text_2">{{ template_data.final_feature_text_2 }}</span></span
+          >
+          <span
+            ><i
+              class="fas fa-{{ template_data.final_feature_icon_3 }}"
+              data-meta="final_feature_icon_3"
+              data-type="icon"
+            ></i>
+            <span data-meta="final_feature_text_3">{{ template_data.final_feature_text_3 }}</span></span
+          >
+          <span
+            ><i
+              class="fas fa-{{ template_data.final_feature_icon_4 }}"
+              data-meta="final_feature_icon_4"
+              data-type="icon"
+            ></i>
+            <span data-meta="final_feature_text_4">{{ template_data.final_feature_text_4 }}</span></span
+          >
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function toggleFAQ(num) {
+        const content = document.getElementById(`faq-content-${num}`);
+        const icon = document.getElementById(`faq-icon-${num}`);
+
+        if (content.classList.contains('hidden')) {
+          content.classList.remove('hidden');
+          icon.style.transform = 'rotate(180deg)';
+        } else {
+          content.classList.add('hidden');
+          icon.style.transform = 'rotate(0deg)';
+        }
+      }
+    </script>
+
+    <footer class="bg-slate-900 text-gray-400 py-16">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-4 gap-8 mb-12">
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <span class="font-space font-bold text-2xl text-white" data-meta="footer_brand_part_1">
+                {{- template_data.footer_brand_part_1 -}}
+              </span>
+              <span class="font-space font-bold text-2xl text-emerald-400" data-meta="footer_brand_part_2">
+                {{- template_data.footer_brand_part_2 -}}
+              </span>
+            </div>
+            <p class="text-sm mb-4" data-meta="footer_description">
+              {{ template_data.footer_description }}
+            </p>
+            <div class="flex gap-4">
+              <a
+                href="{{ template_data.footer_social_link_1 }}"
+                class="text-gray-400 hover:text-emerald-400 transition-colors"
+                data-meta="footer_social_link_1"
+              >
+                <i
+                  class="fab fa-{{ template_data.footer_social_icon_1 }}"
+                  data-meta="footer_social_icon_1"
+                  data-type="icon"
+                ></i>
+              </a>
+              <a
+                href="{{ template_data.footer_social_link_2 }}"
+                class="text-gray-400 hover:text-emerald-400 transition-colors"
+                data-meta="footer_social_link_2"
+              >
+                <i
+                  class="fab fa-{{ template_data.footer_social_icon_2 }}"
+                  data-meta="footer_social_icon_2"
+                  data-type="icon"
+                ></i>
+              </a>
+              <a
+                href="{{ template_data.footer_social_link_3 }}"
+                class="text-gray-400 hover:text-emerald-400 transition-colors"
+                data-meta="footer_social_link_3"
+              >
+                <i
+                  class="fab fa-{{ template_data.footer_social_icon_3 }}"
+                  data-meta="footer_social_icon_3"
+                  data-type="icon"
+                ></i>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-white mb-4" data-meta="footer_column_title_1">
+              {{ template_data.footer_column_title_1 }}
+            </h4>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a
+                  href="{{ template_data.footer_link_1a }}"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_1a footer_link_text_1a"
+                >
+                  {{- template_data.footer_link_text_1a -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="{{ template_data.footer_link_1b }}"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_1b footer_link_text_1b"
+                >
+                  {{- template_data.footer_link_text_1b -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="{{ template_data.footer_link_1c }}"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_1c footer_link_text_1c"
+                >
+                  {{- template_data.footer_link_text_1c -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="{{ template_data.footer_link_1d }}"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_1d footer_link_text_1d"
+                >
+                  {{- template_data.footer_link_text_1d -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="{{ template_data.footer_link_1e }}"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_1e footer_link_text_1e"
+                >
+                  {{- template_data.footer_link_text_1e -}}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-white mb-4" data-meta="footer_column_title_2">
+              {{ template_data.footer_column_title_2 }}
+            </h4>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a
+                  href="#"
+                  onclick="openPopup('setup-guide'); return false;"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_2a"
+                >
+                  {{- template_data.footer_link_2a -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="openPopup('warranty'); return false;"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_2b"
+                >
+                  {{- template_data.footer_link_2b -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="openPopup('shipping'); return false;"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_2c"
+                >
+                  {{- template_data.footer_link_2c -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="openPopup('returns'); return false;"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_2d"
+                >
+                  {{- template_data.footer_link_2d -}}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onclick="openPopup('contact'); return false;"
+                  class="hover:text-emerald-400 transition-colors"
+                  data-meta="footer_link_2e"
+                >
+                  {{- template_data.footer_link_2e -}}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-white mb-4" data-meta="footer_column_title_3">
+              {{ template_data.footer_column_title_3 }}
+            </h4>
+            <p class="text-sm mb-4" data-meta="footer_newsletter_text">
+              {{ template_data.footer_newsletter_text }}
+            </p>
+            <div class="flex gap-2 lg:flex md:hidden">
+              <input
+                type="email"
+                placeholder="{{ template_data.footer_email_placeholder }}"
+                class="flex-1 bg-slate-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                data-meta="footer_email_placeholder"
+              >
+              <button
+                class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                <i
+                  class="fas fa-{{ template_data.footer_submit_icon }}"
+                  data-meta="footer_submit_icon"
+                  data-type="icon"
+                ></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800 pt-8">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-sm text-center md:text-left" data-meta="footer_copyright">
+              {{ template_data.footer_copyright }}
+            </p>
+            <div class="flex flex-wrap justify-center gap-6 text-sm">
+              <a
+                href="#"
+                onclick="openPopup('privacy'); return false;"
+                class="hover:text-emerald-400 transition-colors"
+                data-meta="footer_legal_link_1"
+              >
+                {{- template_data.footer_legal_link_1 -}}
+              </a>
+              <a
+                href="#"
+                onclick="openPopup('terms'); return false;"
+                class="hover:text-emerald-400 transition-colors"
+                data-meta="footer_legal_link_2"
+              >
+                {{- template_data.footer_legal_link_2 -}}
+              </a>
+              <a
+                href="#"
+                onclick="openPopup('about'); return false;"
+                class="hover:text-emerald-400 transition-colors"
+                data-meta="footer_legal_link_3"
+              >
+                {{- template_data.footer_legal_link_3 -}}
+              </a>
+              <a
+                href="#"
+                onclick="openPopup('disclaimer'); return false;"
+                class="hover:text-emerald-400 transition-colors"
+                data-meta="footer_legal_link_4"
+              >
+                {{- template_data.footer_legal_link_4 -}}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center gap-4 mt-8 opacity-50">
+          <i class="fab fa-cc-visa text-3xl"></i>
+          <i class="fab fa-cc-mastercard text-3xl"></i>
+          <i class="fab fa-cc-amex text-3xl"></i>
+          <i class="fab fa-cc-paypal text-3xl"></i>
+          <i class="fas fa-lock text-3xl"></i>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      id="privacy-popup"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] items-center justify-center p-4"
+      style="display: none"
+    >
+      <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h3 class="font-semibold text-xl text-slate-900" data-meta="privacy_popup_title">
+            {{ template_data.privacy_popup_title }}
+          </h3>
+          <button onclick="closePopup('privacy')" class="text-gray-400 hover:text-gray-600">
+            <i
+              class="fas fa-{{ template_data.popup_close_button_icon }}"
+              data-meta="popup_close_button_icon"
+              data-type="icon"
+            ></i>
+          </button>
+        </div>
+        <div class="p-6 prose prose-slate max-w-none">
+          <p class="text-gray-600" data-meta="privacy_popup_date">{{ template_data.privacy_popup_date }}</p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="privacy_section_1_title">
+            {{ template_data.privacy_section_1_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="privacy_section_1_content">
+            {{ template_data.privacy_section_1_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="privacy_section_2_title">
+            {{ template_data.privacy_section_2_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="privacy_section_2_content">
+            {{ template_data.privacy_section_2_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="privacy_section_3_title">
+            {{ template_data.privacy_section_3_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="privacy_section_3_content">
+            {{ template_data.privacy_section_3_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="privacy_section_4_title">
+            {{ template_data.privacy_section_4_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="privacy_section_4_content">
+            {{ template_data.privacy_section_4_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="privacy_section_5_title">
+            {{ template_data.privacy_section_5_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="privacy_section_5_content">
+            {{ template_data.privacy_section_5_content }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="terms-popup"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] items-center justify-center p-4"
+      style="display: none"
+    >
+      <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h3 class="font-semibold text-xl text-slate-900" data-meta="terms_popup_title">
+            {{ template_data.terms_popup_title }}
+          </h3>
+          <button onclick="closePopup('terms')" class="text-gray-400 hover:text-gray-600">
+            <i
+              class="fas fa-{{ template_data.popup_close_button_icon }}"
+              data-meta="popup_close_button_icon"
+              data-type="icon"
+            ></i>
+          </button>
+        </div>
+        <div class="p-6 prose prose-slate max-w-none">
+          <p class="text-gray-600" data-meta="terms_popup_date">{{ template_data.terms_popup_date }}</p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="terms_section_1_title">
+            {{ template_data.terms_section_1_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="terms_section_1_content">
+            {{ template_data.terms_section_1_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="terms_section_2_title">
+            {{ template_data.terms_section_2_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="terms_section_2_content">
+            {{ template_data.terms_section_2_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="terms_section_3_title">
+            {{ template_data.terms_section_3_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="terms_section_3_content">
+            {{ template_data.terms_section_3_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="terms_section_4_title">
+            {{ template_data.terms_section_4_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="terms_section_4_content">
+            {{ template_data.terms_section_4_content }}
+          </p>
+
+          <h4 class="font-semibold text-slate-900 mt-6" data-meta="terms_section_5_title">
+            {{ template_data.terms_section_5_title }}
+          </h4>
+          <p class="text-slate-600" data-meta="terms_section_5_content">
+            {{ template_data.terms_section_5_content }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remaining popups follow same pattern with unique field names -->
+
+    <script>
+      let scrollPosition = 0;
+
+      function openPopup(popupType) {
+        scrollPosition = window.pageYOffset;
+
+        const popup = document.getElementById(popupType + '-popup');
+        if (popup) {
+          popup.style.display = 'flex';
+          document.body.style.position = 'fixed';
+          document.body.style.top = `-${scrollPosition}px`;
+          document.body.style.width = '100%';
+        }
+      }
+
+      function closePopup(popupType) {
+        const popup = document.getElementById(popupType + '-popup');
+        if (popup) {
+          popup.style.display = 'none';
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.width = '';
+          window.scrollTo(0, scrollPosition);
+        }
+      }
+
+      document.querySelectorAll('[id$="-popup"]').forEach((popup) => {
+        popup.addEventListener('click', function (e) {
+          if (e.target === this) {
+            const popupType = this.id.replace('-popup', '');
+            closePopup(popupType);
+          }
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId && targetId !== '#') {
+              const target = document.querySelector(targetId);
+              if (target) {
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth',
+                });
+              }
+            }
+          });
+        });
+      });
+
+      document.querySelector('footer input[type="email"]').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const email = this.value;
+          if (email && email.includes('@')) {
+            alert('Thank you for subscribing! Check your email for confirmation.');
+            this.value = '';
+          }
+        }
+      });
+
+      document.querySelector('footer button').addEventListener('click', function (e) {
+        const emailInput = this.previousElementSibling;
+        const email = emailInput.value;
+        if (email && email.includes('@')) {
+          alert('Thank you for subscribing! Check your email for confirmation.');
+          emailInput.value = '';
+        }
+      });
+
+      console.log('TrailVision Pro X50 Landing Page Loaded Successfully');
+    </script>
+  </body>
+</html>

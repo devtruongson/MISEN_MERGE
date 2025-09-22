@@ -719,7 +719,7 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
     useEffect(() => {
         const generatePrompt = () => {
             const section = formData.sections[0]; // Lấy section đầu tiên để demo
-            return `Generate ${section.imageQuantity || '1'} images in ${section.visualStyle || 'Lifestyle/Natural'} style for ${formData.productName} (${formData.mainUSP}). 
+            return `Generate image in ${section.visualStyle || 'Lifestyle/Natural'} style for ${formData.productName} (${formData.mainUSP}). 
               Section: ${section.sectionName || 'Hero Image'}. Description: ${section.description || 'Show the product in use'}. 
               Goal: ${section.contentGoal || 'Create Desire'}. Target: ${formData.targetCustomer || 'Everyone'}. 
               Include references like ${formData.referenceImages.join(', ') || 'none'}. 
@@ -767,6 +767,14 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
         }));
     };
 
+    // Xóa section (chỉ cho phép xóa nếu có hơn 1 section)
+    const removeSection = (index) => {
+        if (formData.sections.length > 1) {
+            const updatedSections = formData.sections.filter((_, i) => i !== index);
+            setFormData((prev) => ({ ...prev, sections: updatedSections }));
+        }
+    };
+
     // Generate ảnh
     const generateImages = async () => {
         if (!prompt.trim()) {
@@ -779,17 +787,12 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
 
         try {
             const config = window.AI_CONFIG || {
-                apiEndpoint: 'https://api.openai.com/v1/images/generations',
+                apiEndpoint: 'https://n8n.misencorp.com/webhook/gen-images',
                 requestConfig: {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer YOUR_API_KEY_HERE',
                     },
-                },
-                generationParams: {
-                    n: 4,
-                    size: '1024x1024',
                 },
             };
 
@@ -798,9 +801,15 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
                 ...config.generationParams,
             };
 
+            const dataSend = [];
+
+            for (let i = 0; i < parseInt(formData.sections[0]?.imageQuantity || "1"); i++) {
+                dataSend.push(requestBody);
+            }
+
             const response = await fetch(config.apiEndpoint, {
                 ...config.requestConfig,
-                body: JSON.stringify(requestBody),
+                body: JSON.stringify(dataSend),
             });
 
             if (!response.ok) {
@@ -808,7 +817,21 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
             }
 
             const data = await response.json();
-            setGeneratedImages(data.data || []);
+
+            // Xử lý response format mới với revised_prompt và url
+            const processedImages = [];
+            if (Array.isArray(data)) {
+                data.forEach(item => {
+                    if (item.url) {
+                        processedImages.push({
+                            url: item.url,
+                            revised_prompt: item.revised_prompt || prompt
+                        });
+                    }
+                });
+            }
+
+            setGeneratedImages(processedImages);
         } catch (err) {
             console.error('Error generating images:', err);
             setError('Failed to generate images. Please try again.');
@@ -823,274 +846,408 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
         onClose();
     };
 
+    console.log("check re-render")
+
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-            <div className="bg-white rounded-2xl p-6 w-[800px] max-h-[90vh] overflow-y-auto shadow-xl">
-                <h2 className="text-xl font-semibold mb-4">Image Type Selection & Generator</h2>
-                <p className="text-gray-600 mb-6">Fill the form to generate AI images</p>
-
-                {/* CORE PRODUCT INPUTS */}
-                <div className="border rounded p-4 mb-4">
-                    <h3 className="text-lg font-medium mb-2">Core Product Inputs</h3>
-                    <div className="space-y-4">
-                        <input
-                            type="text"
-                            name="brandName"
-                            value={formData.brandName}
-                            onChange={handleInputChange}
-                            placeholder="Brand Name"
-                            className="w-full p-2 border rounded"
-                        />
-                        <input
-                            type="text"
-                            name="productName"
-                            value={formData.productName}
-                            onChange={handleInputChange}
-                            placeholder="Product Name"
-                            className="w-full p-2 border rounded"
-                        />
-                        <input
-                            type="text"
-                            name="productCategory"
-                            value={formData.productCategory}
-                            onChange={handleInputChange}
-                            placeholder="Product Category"
-                            className="w-full p-2 border rounded"
-                        />
-                        <input
-                            type="text"
-                            name="productType"
-                            value={formData.productType}
-                            onChange={handleInputChange}
-                            placeholder="Product Type"
-                            className="w-full p-2 border rounded"
-                        />
-                        <input
-                            type="text"
-                            name="mainUSP"
-                            value={formData.mainUSP}
-                            onChange={handleInputChange}
-                            placeholder="Main USP (one short sentence)"
-                            className="w-full p-2 border rounded"
-                        />
-                        <select
-                            name="productSize"
-                            value={formData.productSize}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="">Select Size</option>
-                            <option value="Tiny">Tiny</option>
-                            <option value="Small">Small</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Large">Large</option>
-                            <option value="Oversized">Oversized</option>
-                        </select>
-                        <select
-                            name="targetCustomer"
-                            value={formData.targetCustomer}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="">Select Target Customer</option>
-                            <option value="Everyone">Everyone</option>
-                            <option value="Men">Men</option>
-                            <option value="Women">Women</option>
-                            <option value="Professionals">Professionals</option>
-                            <option value="Seniors">Seniors</option>
-                            <option value="Pet Owners">Pet Owners</option>
-                        </select>
-                        <select
-                            name="priceRange"
-                            value={formData.priceRange}
-                            onChange={handleInputChange}
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="">Select Price Range</option>
-                            <option value="Budget">Budget</option>
-                            <option value="Mid">Mid</option>
-                            <option value="Premium">Premium</option>
-                            <option value="Luxury">Luxury</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* REFERENCE IMAGES INPUT */}
-                <div className="border rounded p-4 mb-4">
-                    <h3 className="text-lg font-medium mb-2">Reference Images Input</h3>
-                    <div className="space-y-2">
-                        {[
-                            'Product on white background',
-                            'Product packaging/box',
-                            'Product lifestyle shot',
-                            'Product in use',
-                            'Product details/close-up',
-                            'Product dimensions/size chart',
-                            'Brand logo',
-                            'Competitor product',
-                            'Old/current product (for comparison)',
-                            'Customer photos/UGC',
-                            'Certification/awards',
-                            'Influencer with product',
-                            'Before/after results',
-                            'Infographic/data',
-                            'Manual/instruction pages',
-                            '[Upload custom images]',
-                        ].map((option) => (
-                            <div key={option} className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    value={option}
-                                    checked={formData.referenceImages.includes(option)}
-                                    onChange={handleCheckboxChange}
-                                    className="mr-2"
-                                />
-                                <label>{option}</label>
-                                {option === '[Upload custom images]' && formData.referenceImages.includes(option) && (
-                                    <input
-                                        type="file"
-                                        multiple
-                                        onChange={handleFileChange}
-                                        className="ml-2 p-2 border rounded"
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* SECTION CONFIGURATION */}
-                <div className="border rounded p-4 mb-4">
-                    <h3 className="text-lg font-medium mb-2">Section Configuration</h3>
-                    {formData.sections.map((section, index) => (
-                        <div key={index} className="mt-4 border p-4 rounded">
-                            <h4 className="text-md font-medium">Section #{index + 1}</h4>
-                            <select
-                                name="sectionName"
-                                value={section.sectionName}
-                                onChange={(e) => handleSectionChange(index, e)}
-                                className="w-full p-2 border rounded mb-2"
-                            >
-                                <option value="">Choose Section</option>
-                                <option value="Hero Image">Hero Image</option>
-                                <option value="Homepage Banner">Homepage Banner</option>
-                                <option value="Product Gallery">Product Gallery</option>
-                                <option value="Features & Benefits">Features & Benefits</option>
-                                <option value="How It Works">How It Works</option>
-                                <option value="How to Use">How to Use</option>
-                                <option value="Before & After">Before & After</option>
-                                <option value="Customer Reviews/Testimonials">Customer Reviews/Testimonials</option>
-                                <option value="Problem & Solution">Problem & Solution</option>
-                                <option value="Scientific/Research">Scientific/Research</option>
-                                <option value="Comparison">Comparison</option>
-                                <option value="Warranty/Guarantee">Warranty/Guarantee</option>
-                                <option value="[Custom Section]">[Custom Section]</option>
-                            </select>
-                            <textarea
-                                name="description"
-                                value={section.description}
-                                onChange={(e) => handleSectionChange(index, e)}
-                                placeholder="Section Description"
-                                className="w-full p-2 border rounded mb-2"
-                            />
-                            <select
-                                name="contentGoal"
-                                value={section.contentGoal}
-                                onChange={(e) => handleSectionChange(index, e)}
-                                className="w-full p-2 border rounded mb-2"
-                            >
-                                <option value="">Select Goal</option>
-                                <option value="Build Trust">Build Trust</option>
-                                <option value="Show Value">Show Value</option>
-                                <option value="Explain Function">Explain Function</option>
-                                <option value="Prove Results">Prove Results</option>
-                                <option value="Create Desire">Create Desire</option>
-                                <option value="Remove Doubts">Remove Doubts</option>
-                                <option value="Drive Action">Drive Action</option>
-                            </select>
-                            <select
-                                name="imageQuantity"
-                                value={section.imageQuantity}
-                                onChange={(e) => handleSectionChange(index, e)}
-                                className="w-full p-2 border rounded mb-2"
-                            >
-                                <option value="">Select Quantity</option>
-                                <option value="1 image">1 image</option>
-                                <option value="2-3 images">2-3 images</option>
-                                <option value="4-6 images">4-6 images</option>
-                                <option value="7-10 images">7-10 images</option>
-                                <option value="10+ images">10+ images</option>
-                            </select>
-                            <select
-                                name="visualStyle"
-                                value={section.visualStyle}
-                                onChange={(e) => handleSectionChange(index, e)}
-                                className="w-full p-2 border rounded mb-2"
-                            >
-                                <option value="">Select Style</option>
-                                <option value="Professional/Studio">Professional/Studio</option>
-                                <option value="Lifestyle/Natural">Lifestyle/Natural</option>
-                                <option value="Technical/Diagram">Technical/Diagram</option>
-                                <option value="UGC/Authentic">UGC/Authentic</option>
-                                <option value="3D/CGI">3D/CGI</option>
-                                <option value="Mixed">Mixed</option>
-                            </select>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-h-[95vh] overflow-hidden border border-gray-100">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 px-8 py-6 text-white">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold mb-2">🎨 AI Image Generator</h2>
+                            <p className="text-purple-100 opacity-90">Create stunning product images with advanced AI</p>
                         </div>
-                    ))}
-                    <button
-                        onClick={addSection}
-                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                        [+ Add Section]
-                    </button>
-                </div>
-
-                {/* Generate Images Section */}
-                <div className="mt-4">
-                    <h3 className="text-lg font-medium mb-2">Generate Images</h3>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={generateImages}
-                            disabled={isGenerating || !prompt.trim()}
-                            className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isGenerating ? 'Generating...' : 'Generate Images'}
-                        </button>
                         <button
                             onClick={onClose}
-                            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                            className="p-2 hover:bg-white/20 rounded-full transition-colors"
                         >
-                            Cancel
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
                     </div>
+                </div>
 
-                    {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
-
-                    {generatedImages.length > 0 && (
-                        <div className="mt-4">
-                            <h4 className="text-md font-medium mb-2">Generated Images</h4>
-                            <div className="grid grid-cols-2 gap-4">
-                                {generatedImages.map((image, index) => (
-                                    <div key={index} className="relative group">
-                                        <img
-                                            src={image.url}
-                                            alt={`Generated image ${index + 1}`}
-                                            className="w-full h-48 object-cover rounded border cursor-pointer hover:opacity-90"
-                                            onClick={() => selectImage(image.url)}
-                                        />
-                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                            <button
-                                                onClick={() => selectImage(image.url)}
-                                                className="px-4 py-2 bg-white text-black rounded-md hover:bg-gray-100"
-                                            >
-                                                Select This Image
-                                            </button>
-                                        </div>
+                {/* Content */}
+                <div className="flex h-[calc(95vh-100px)]">
+                    {/* Left Panel - Form */}
+                    <div className="flex-1 p-8 overflow-y-auto bg-gray-50">
+                        <div className="space-y-8">
+                            {/* CORE PRODUCT INPUTS */}
+                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                                <div className="flex items-center mb-6">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+                                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
                                     </div>
-                                ))}
+                                    <h3 className="text-xl font-semibold text-gray-800">Core Product Information</h3>
+                                </div>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Brand Name</label>
+                                        <input
+                                            type="text"
+                                            name="brandName"
+                                            value={formData.brandName}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter brand name"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Product Name</label>
+                                        <input
+                                            type="text"
+                                            name="productName"
+                                            value={formData.productName}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter product name"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Product Category</label>
+                                        <input
+                                            type="text"
+                                            name="productCategory"
+                                            value={formData.productCategory}
+                                            onChange={handleInputChange}
+                                            placeholder="e.g., Electronics, Fashion"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Product Type</label>
+                                        <input
+                                            type="text"
+                                            name="productType"
+                                            value={formData.productType}
+                                            onChange={handleInputChange}
+                                            placeholder="e.g., Smartphone, T-shirt"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <div className="col-span-2 space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Main USP</label>
+                                        <input
+                                            type="text"
+                                            name="mainUSP"
+                                            value={formData.mainUSP}
+                                            onChange={handleInputChange}
+                                            placeholder="What makes your product unique?"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Product Size</label>
+                                        <select
+                                            name="productSize"
+                                            value={formData.productSize}
+                                            onChange={handleInputChange}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                        >
+                                            <option value="">Select Size</option>
+                                            <option value="Tiny">Tiny</option>
+                                            <option value="Small">Small</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Large">Large</option>
+                                            <option value="Oversized">Oversized</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Target Customer</label>
+                                        <select
+                                            name="targetCustomer"
+                                            value={formData.targetCustomer}
+                                            onChange={handleInputChange}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                        >
+                                            <option value="">Select Target</option>
+                                            <option value="Everyone">Everyone</option>
+                                            <option value="Men">Men</option>
+                                            <option value="Women">Women</option>
+                                            <option value="Professionals">Professionals</option>
+                                            <option value="Seniors">Seniors</option>
+                                            <option value="Pet Owners">Pet Owners</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Price Range</label>
+                                        <select
+                                            name="priceRange"
+                                            value={formData.priceRange}
+                                            onChange={handleInputChange}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                        >
+                                            <option value="">Select Range</option>
+                                            <option value="Budget">Budget</option>
+                                            <option value="Mid">Mid</option>
+                                            <option value="Premium">Premium</option>
+                                            <option value="Luxury">Luxury</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* REFERENCE IMAGES INPUT */}
+                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                                <div className="flex items-center mb-6">
+                                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-800">Reference Images</h3>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {[
+                                        'Product on white background', 'Product packaging/box', 'Product lifestyle shot', 'Product in use',
+                                        'Product details/close-up', 'Product dimensions/size chart', 'Brand logo', 'Competitor product',
+                                        'Old/current product (for comparison)', 'Customer photos/UGC', 'Certification/awards', 'Influencer with product',
+                                        'Before/after results', 'Infographic/data', 'Manual/instruction pages', '[Upload custom images]'
+                                    ].map((option) => (
+                                        <div key={option} className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                value={option}
+                                                checked={formData.referenceImages.includes(option)}
+                                                onChange={handleCheckboxChange}
+                                                className="mr-3 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label className="text-md text-gray-700 cursor-pointer flex-1">{option}</label>
+                                            {option === '[Upload custom images]' && formData.referenceImages.includes(option) && (
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    onChange={handleFileChange}
+                                                    className="ml-3 text-xs border border-gray-300 rounded px-2 py-1"
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* SECTION CONFIGURATION */}
+                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center">
+                                        <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                                            <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-gray-800">Section Configuration</h3>
+                                    </div>
+                                    <button
+                                        onClick={addSection}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        Add Section
+                                    </button>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {formData.sections.map((section, index) => (
+                                        <div key={index} className="border border-gray-200 rounded-xl p-6 bg-gray-50 relative">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h4 className="text-lg font-medium text-gray-800">Section #{index + 1}</h4>
+                                                {formData.sections.length > 1 && (
+                                                    <button
+                                                        onClick={() => removeSection(index)}
+                                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors group"
+                                                        title="Delete this section"
+                                                    >
+                                                        <svg className="w-5 h-5 group-hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-medium text-gray-700">Section Type</label>
+                                                    <select
+                                                        name="sectionName"
+                                                        value={section.sectionName}
+                                                        onChange={(e) => handleSectionChange(index, e)}
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                                    >
+                                                        <option value="">Choose Section</option>
+                                                        <option value="Hero Image">Hero Image</option>
+                                                        <option value="Homepage Banner">Homepage Banner</option>
+                                                        <option value="Product Gallery">Product Gallery</option>
+                                                        <option value="Features & Benefits">Features & Benefits</option>
+                                                        <option value="How It Works">How It Works</option>
+                                                        <option value="How to Use">How to Use</option>
+                                                        <option value="Before & After">Before & After</option>
+                                                        <option value="Customer Reviews/Testimonials">Customer Reviews/Testimonials</option>
+                                                        <option value="Problem & Solution">Problem & Solution</option>
+                                                        <option value="Scientific/Research">Scientific/Research</option>
+                                                        <option value="Comparison">Comparison</option>
+                                                        <option value="Warranty/Guarantee">Warranty/Guarantee</option>
+                                                        <option value="[Custom Section]">[Custom Section]</option>
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-medium text-gray-700">Content Goal</label>
+                                                    <select
+                                                        name="contentGoal"
+                                                        value={section.contentGoal}
+                                                        onChange={(e) => handleSectionChange(index, e)}
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                                    >
+                                                        <option value="">Select Goal</option>
+                                                        <option value="Build Trust">Build Trust</option>
+                                                        <option value="Show Value">Show Value</option>
+                                                        <option value="Explain Function">Explain Function</option>
+                                                        <option value="Prove Results">Prove Results</option>
+                                                        <option value="Create Desire">Create Desire</option>
+                                                        <option value="Remove Doubts">Remove Doubts</option>
+                                                        <option value="Drive Action">Drive Action</option>
+                                                    </select>
+                                                </div>
+                                                <div className="col-span-2 space-y-2">
+                                                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                                                    <textarea
+                                                        name="description"
+                                                        value={section.description}
+                                                        onChange={(e) => handleSectionChange(index, e)}
+                                                        placeholder="Describe what you want to show in this section..."
+                                                        rows={3}
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-medium text-gray-700">Image Quantity</label>
+                                                    <select
+                                                        name="imageQuantity"
+                                                        value={section.imageQuantity}
+                                                        onChange={(e) => handleSectionChange(index, e)}
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                                    >
+                                                        <option value="">Select Quantity</option>
+                                                        <option value="1 image">1 image</option>
+                                                        <option value="2-3 images">2-3 images</option>
+                                                        <option value="4-6 images">4-6 images</option>
+                                                        <option value="7-10 images">7-10 images</option>
+                                                        <option value="10+ images">10+ images</option>
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-medium text-gray-700">Visual Style</label>
+                                                    <select
+                                                        name="visualStyle"
+                                                        value={section.visualStyle}
+                                                        onChange={(e) => handleSectionChange(index, e)}
+                                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                                    >
+                                                        <option value="">Select Style</option>
+                                                        <option value="Professional/Studio">Professional/Studio</option>
+                                                        <option value="Lifestyle/Natural">Lifestyle/Natural</option>
+                                                        <option value="Technical/Diagram">Technical/Diagram</option>
+                                                        <option value="UGC/Authentic">UGC/Authentic</option>
+                                                        <option value="3D/CGI">3D/CGI</option>
+                                                        <option value="Mixed">Mixed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    )}
+                    </div>
+
+                    <div className="w-[40%] bg-white border-l border-gray-200 flex flex-col">
+                        <div className="p-6 border-b border-gray-200">
+                            <button
+                                onClick={generateImages}
+                                disabled={isGenerating || !prompt.trim()}
+                                className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 flex items-center justify-center gap-2 font-semibold"
+                            >
+                                {isGenerating ? (
+                                    <>
+                                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        Generate Images
+                                    </>
+                                )}
+                            </button>
+
+                            {error && (
+                                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                    <div className="text-red-800 text-sm font-medium">Error</div>
+                                    <div className="text-red-600 text-sm">{error}</div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Generated Images */}
+                        <div className="flex-1 p-6 overflow-y-auto">
+                            {generatedImages.length > 0 ? (
+                                <div>
+                                    <h4 className="text-lg font-semibold text-gray-800 mb-4">Generated Images ({generatedImages.length})</h4>
+                                    <div className="space-y-6">
+                                        {generatedImages.map((image, index) => (
+                                            <div key={index} className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                                                <div className="relative group">
+                                                    <img
+                                                        src={image.url}
+                                                        alt={`Generated image ${index + 1}`}
+                                                        className="w-full h-48 object-cover cursor-pointer hover:scale-105 transition-transform"
+                                                        onClick={() => selectImage(image.url)}
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                        <button
+                                                            onClick={() => selectImage(image.url)}
+                                                            className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 font-medium transition-colors"
+                                                        >
+                                                            Select This Image
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {image.revised_prompt && (
+                                                    <div className="p-4 bg-gray-50 border-t border-gray-200">
+                                                        <div className="flex items-start gap-2">
+                                                            <svg className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            <div className="flex-1">
+                                                                <h5 className="text-xs font-semibold text-gray-700 mb-1">Revised Prompt:</h5>
+                                                                <p className="text-xs text-gray-600 leading-relaxed">{image.revised_prompt}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                    <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p className="text-center">Generated images will appear here</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1146,157 +1303,250 @@ function ImageEditModal({ metaKeys, currentValues, element, onSave, onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-            <div className="bg-white rounded-2xl p-6 w-[600px] max-h-[80vh] overflow-y-auto shadow-xl">
-                <h2 className="text-xl font-semibold mb-4">🖼️ Edit Image & Alt Text</h2>
-                <p className="text-gray-600 mb-6">
-                    {metaKeys.length === 1
-                        ? 'Edit image and alt text below:'
-                        : 'This image element has multiple meta attributes. Edit each field below:'
-                    }
-                </p>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-100">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-8 py-6 text-white">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold mb-2">🖼️ Edit Image & Alt Text</h2>
+                            <p className="text-blue-100 opacity-90">
+                                {metaKeys.length === 1
+                                    ? 'Customize your image and add descriptive alt text'
+                                    : 'This element has multiple attributes - edit each field below'
+                                }
+                            </p>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
-                <div className="space-y-4">
-                    {metaKeys.map((metaKey, index) => {
-                        if (!metaKey.trim()) return null;
-                        const uniqueKey = metaKeys.length > 1 ? `${metaKey}_${index}` : metaKey;
-                        const displayName = metaKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                {/* Content */}
+                <div className="p-8 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div className="space-y-8">
+                        {metaKeys.map((metaKey, index) => {
+                            if (!metaKey.trim()) return null;
+                            const uniqueKey = metaKeys.length > 1 ? `${metaKey}_${index}` : metaKey;
+                            const displayName = metaKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
-                        // Nếu chỉ có 1 meta và là image, hiển thị cả image và alt fields
-                        if (metaKeys.length === 1) {
-                            return (
-                                <div key={uniqueKey} className="space-y-4">
-                                    {/* Image Field */}
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            {displayName} (Image)
-                                        </label>
-                                        {values[uniqueKey] && (
-                                            <img
-                                                src={values[uniqueKey]}
-                                                alt="Preview"
-                                                className="w-48 h-48 object-cover rounded border mb-2"
-                                            />
+                            // Single meta field layout
+                            if (metaKeys.length === 1) {
+                                return (
+                                    <div key={uniqueKey} className="space-y-8">
+                                        {/* Image Section */}
+                                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                                            <div className="flex items-center mb-6">
+                                                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+                                                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                                <h3 className="text-xl font-semibold text-gray-800">{displayName}</h3>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                                {/* Image Preview */}
+                                                <div className="space-y-4">
+                                                    <label className="block text-sm font-medium text-gray-700">Image Preview</label>
+                                                    <div className="relative">
+                                                        {values[uniqueKey] ? (
+                                                            <img
+                                                                src={values[uniqueKey]}
+                                                                alt="Preview"
+                                                                className="w-full h-64 object-cover rounded-xl border-2 border-gray-200 shadow-sm"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-64 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center">
+                                                                <svg className="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                                <p className="text-gray-500">No image selected</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Image Controls */}
+                                                <div className="space-y-6">
+                                                    <div className="space-y-3">
+                                                        <label className="block text-sm font-medium text-gray-700">Image URL</label>
+                                                        <input
+                                                            type="text"
+                                                            value={values[uniqueKey] || ''}
+                                                            onChange={(e) => handleInputChange(uniqueKey, e.target.value)}
+                                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                            placeholder="Enter image URL or use buttons below..."
+                                                        />
+                                                    </div>
+
+                                                    <div className="space-y-3">
+                                                        <label className="block text-sm font-medium text-gray-700">Upload Options</label>
+                                                        <div className="grid grid-cols-1 gap-3">
+                                                            <label className="flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-xl cursor-pointer hover:bg-blue-600 transition-colors group">
+                                                                <svg className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                                </svg>
+                                                                Upload from Computer
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={handleImageUpload}
+                                                                    className="hidden"
+                                                                />
+                                                            </label>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => openImageGeneratorModal(uniqueKey)}
+                                                                className="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 group"
+                                                            >
+                                                                <svg className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                                </svg>
+                                                                AI Generate Image
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Alt Text Section */}
+                                        {metaKeys.join(' ').includes('alt') && (
+                                            <div className="bg-green-50 rounded-2xl p-6 border border-green-200">
+                                                <div className="flex items-center mb-6">
+                                                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                                                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-xl font-semibold text-gray-800">Alt Text</h3>
+                                                        <p className="text-sm text-green-600 mt-1">Improves accessibility and SEO</p>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <label className="block text-sm font-medium text-gray-700">Alternative Text Description</label>
+                                                    <input
+                                                        type="text"
+                                                        value={values[`${uniqueKey}_alt`] || ''}
+                                                        onChange={(e) => handleInputChange(`${uniqueKey}_alt`, e.target.value)}
+                                                        className="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                                        placeholder="Describe the image for screen readers and SEO..."
+                                                    />
+                                                    <p className="text-xs text-gray-500">
+                                                        💡 Tip: Describe what's in the image, not just "image" or "photo"
+                                                    </p>
+                                                </div>
+                                            </div>
                                         )}
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={values[uniqueKey] || ''}
-                                                onChange={(e) => handleInputChange(uniqueKey, e.target.value)}
-                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                placeholder="Enter image URL..."
-                                            />
-                                            <label className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600">
-                                                Upload
+                                    </div>
+                                );
+                            }
+                            // Multiple meta fields layout
+                            else if (metaKey.includes('image') && !metaKey.includes('alt')) {
+                                return (
+                                    <div key={uniqueKey} className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                                        <div className="flex items-center mb-6">
+                                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <h4 className="text-lg font-semibold text-gray-800">{displayName}</h4>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                {values[uniqueKey] && (
+                                                    <img
+                                                        src={values[uniqueKey]}
+                                                        alt="Preview"
+                                                        className="w-full h-48 object-cover rounded-lg border border-gray-200 mb-3"
+                                                    />
+                                                )}
+                                            </div>
+                                            <div className="space-y-4">
                                                 <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleImageUpload}
-                                                    className="hidden"
+                                                    type="text"
+                                                    value={values[uniqueKey] || ''}
+                                                    onChange={(e) => handleInputChange(uniqueKey, e.target.value)}
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                    placeholder="Enter image URL..."
                                                 />
-                                            </label>
-                                            <button
-                                                type="button"
-                                                onClick={() => openImageGeneratorModal(uniqueKey)}
-                                                className="px-4 py-2 bg-purple-500 text-white rounded-md cursor-pointer hover:bg-purple-600"
-                                            >
-                                                AI Generate
-                                            </button>
+                                                <div className="flex gap-2">
+                                                    <label className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors text-center text-sm">
+                                                        Upload
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={handleImageUpload}
+                                                            className="hidden"
+                                                        />
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openImageGeneratorModal(uniqueKey)}
+                                                        className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm"
+                                                    >
+                                                        AI Generate
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    {/* Alt Field */}
-                                    {
-                                        metaKeys.join(' ').includes('alt') && <div className="space-y-2">
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Alt Text
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={values[`${uniqueKey}_alt`] || ''}
-                                                onChange={(e) => handleInputChange(`${uniqueKey}_alt`, e.target.value)}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                placeholder="Enter alt text..."
-                                            />
+                                );
+                            } else if (metaKey.includes('alt')) {
+                                return (
+                                    <div key={uniqueKey} className="bg-green-50 rounded-2xl p-6 border border-green-200">
+                                        <div className="flex items-center mb-4">
+                                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                            <h4 className="text-lg font-semibold text-gray-800">{displayName}</h4>
                                         </div>
-                                    }
-                                </div>
-                            );
-                        }
-                        // Nếu có nhiều meta, xử lý như cũ
-                        else if (metaKey.includes('image') && !metaKey.includes('alt')) {
-                            return (
-                                <div key={uniqueKey} className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        {displayName} (Image)
-                                    </label>
-                                    {values[uniqueKey] && (
-                                        <img
-                                            src={values[uniqueKey]}
-                                            alt="Preview"
-                                            className="w-48 h-48 object-cover rounded border mb-2"
-                                        />
-                                    )}
-                                    <div className="flex gap-2">
                                         <input
                                             type="text"
                                             value={values[uniqueKey] || ''}
                                             onChange={(e) => handleInputChange(uniqueKey, e.target.value)}
-                                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            placeholder="Enter image URL..."
+                                            className="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                            placeholder="Describe the image for accessibility..."
                                         />
-                                        <label className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600">
-                                            Upload
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleImageUpload}
-                                                className="hidden"
-                                            />
-                                        </label>
-                                        <button
-                                            type="button"
-                                            onClick={() => openImageGeneratorModal(uniqueKey)}
-                                            className="px-4 py-2 bg-purple-500 text-white rounded-md cursor-pointer hover:bg-purple-600"
-                                        >
-                                            AI Generate
-                                        </button>
                                     </div>
-                                </div>
-                            );
-                        } else if (metaKey.includes('alt')) {
-                            return (
-                                <div key={uniqueKey} className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        {displayName} (Alt Text)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={values[uniqueKey] || ''}
-                                        onChange={(e) => handleInputChange(uniqueKey, e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="Enter alt text..."
-                                    />
-                                </div>
-                            );
-                        }
-                        return null;
-                    })}
+                                );
+                            }
+                            return null;
+                        })}
+                    </div>
                 </div>
 
-                <div className="mt-6 flex justify-end gap-3">
-                    <button
-                        className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-                        onClick={handleSave}
-                    >
-                        Save Changes
-                    </button>
+                {/* Footer */}
+                <div className="bg-gray-50 px-8 py-6 border-t border-gray-200">
+                    <div className="flex justify-end gap-4">
+                        <button
+                            className="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 transition-colors font-medium"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 font-medium flex items-center gap-2"
+                            onClick={handleSave}
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Save Changes
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

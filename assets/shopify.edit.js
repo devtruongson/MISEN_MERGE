@@ -256,7 +256,7 @@ async function handleUpdateMetaFields() {
                     btnSaveChange.style.display = "none";
                     Swal.fire({
                         title: 'Success!',
-                        text: 'Metafields updated successfully',
+                        text: 'Metafields updated successfully (Reload the page to see changes required)',
                         icon: 'success',
                         confirmButtonText: 'Oke'
                     })

@@ -166,6 +166,8 @@ function HandleVariantSelect(variantSelectWrapper, imageRender, handleShowPrice,
 
 function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar }) {
     const [variantActive, setVariantActive] = React.useState(null);
+    const [openDropdown, setOpenDropdown] = React.useState(null); // Changed to single value
+
     React.useEffect(() => {
         setVariantActive(productData?.selected_or_first_available_variant?.id);
     }, [productData]);
@@ -273,29 +275,98 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
         };
     }, [variantActive, productData, dealBar]);
 
-    return <div class="space-y-2 mb-3">
-        {
-            (productData.options.length > 1 || (productData.options.length === 1 && productData.options[0].value.length > 0)) && (
-                productData.options.map((options, index) => {
-                    return (
-                        <select select key={index} onChange={(e) => {
-                            const value = e.target.value;
-                            const variant = productData.variants.find(variant => {
-                                const newValue = variant.title.split(" / ");
-                                newValue[index] = value;
-                                return newValue.join(" / ") === variant.title;
-                            });
-                            if (variant) {
-                                setVariantActive(variant.id);
-                            }
-                        }} value={productData.variants.find(variant => variant.id === variantActive)?.title?.split(" / ")[index]} data-value-selected={productData.variants.find(variant => variant.id === variantActive)?.title?.split(" / ")[index]} class={`bg-gray-50 border border-gray-300 text-[#333] text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${options.values.length == 1 ? "!hidden" : ""}`}>
-                            {options?.values?.map((option) => (
-                                <option value={option}>{option}</option>
-                            ))}
-                        </select>
-                    )
-                })
-            )
+    const toggleDropdown = (optionIndex) => {
+        // If clicking the same dropdown, close it. Otherwise, open the new one
+        setOpenDropdown(prev => prev === optionIndex ? null : optionIndex);
+    };
+
+    const handleOptionSelect = (optionIndex, selectedValue) => {
+        // Get current variant's options
+        const currentVariant = productData.variants.find(variant => variant.id === variantActive);
+        const currentOptions = currentVariant?.title?.split(" / ") || [];
+
+        // Update the specific option
+        const newOptions = [...currentOptions];
+        newOptions[optionIndex] = selectedValue;
+
+        // Find variant that matches the new option combination
+        const newVariant = productData.variants.find(variant => {
+            const variantOptions = variant.title.split(" / ");
+            return newOptions.every((option, idx) => variantOptions[idx] === option);
+        });
+
+        if (newVariant) {
+            setVariantActive(newVariant.id);
         }
-    </div >
+
+        // Close dropdown after selection
+        setOpenDropdown(null);
+    };
+
+    const getCurrentOptionValue = (optionIndex) => {
+        const currentVariant = productData.variants.find(variant => variant.id === variantActive);
+        return currentVariant?.title?.split(" / ")[optionIndex] || '';
+    };
+
+    // Only show options if there are multiple variants and options have more than 1 value
+    const shouldShowOptions = productData.options.length > 0;
+
+    if (!shouldShowOptions) {
+        return null;
+    }
+
+    return (
+        <div className="space-y-2 mb-3">
+            {productData.options.map((option, optionIndex) => {
+                // Skip option if it only has 1 value
+                if (option.values.length <= 1) {
+                    return null;
+                }
+
+                const isOpen = openDropdown === optionIndex;
+
+                return (
+                    <div key={optionIndex} className="relative">
+                        <button
+                            onClick={() => toggleDropdown(optionIndex)}
+                            className={`w-full flex items-center justify-between px-4 py-3 bg-white border-[2px] rounded-xl text-left hover:bg-slate-100 transition-colors ${isOpen ? 'border-slate-800' : ' border-slate-200'}`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="text-black font-medium text-sm">
+                                    {getCurrentOptionValue(optionIndex)}
+                                </span>
+                            </div>
+                            <svg
+                                className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        {isOpen && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-xl shadow-xl z-10 animate-slide-down">
+                                {option.values.map((value, valueIndex) => (
+                                    <button
+                                        key={valueIndex}
+                                        onClick={() => handleOptionSelect(optionIndex, value)}
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors"
+                                    >
+                                        <span className="text-black">{value}</span>
+                                        {getCurrentOptionValue(optionIndex) === value && (
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-500 ml-auto" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M20 6 9 17l-5-5"></path>
+                                            </svg>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
 }

@@ -255,15 +255,24 @@
       }
     {% endstyle %}
 
-    {{ 'base.css' | asset_url | stylesheet_tag }}
-    <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
+    {%- unless template contains 'lp-' -%}
+      {{ 'base.css' | asset_url | stylesheet_tag }}
+      <link
+        rel="stylesheet"
+        href="{{ 'component-cart-items.css' | asset_url }}"
+        media="print"
+        onload="this.media='all'"
+      >
+    {%- endunless -%}
 
     {%- if settings.cart_type == 'drawer' -%}
-      {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
-      {{ 'component-cart.css' | asset_url | stylesheet_tag }}
-      {{ 'component-totals.css' | asset_url | stylesheet_tag }}
-      {{ 'component-price.css' | asset_url | stylesheet_tag }}
-      {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+      {%- unless template contains 'lp-' -%}
+        {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
+        {{ 'component-cart.css' | asset_url | stylesheet_tag }}
+        {{ 'component-totals.css' | asset_url | stylesheet_tag }}
+        {{ 'component-price.css' | asset_url | stylesheet_tag }}
+        {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+      {%- endunless -%}
     {%- endif -%}
 
     {%- unless settings.type_body_font.system? -%}
@@ -276,20 +285,21 @@
       <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
       {% comment %}theme-check-enable AssetPreload{% endcomment %}
     {%- endunless -%}
+    {%- unless template contains 'lp-' -%}
+      {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+        {{ 'component-localization-form.css' | asset_url | stylesheet_tag: preload: true }}
+        <script src="{{ 'localization-form.js' | asset_url }}" defer="defer"></script>
+      {%- endif -%}
 
-    {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
-      {{ 'component-localization-form.css' | asset_url | stylesheet_tag: preload: true }}
-      <script src="{{ 'localization-form.js' | asset_url }}" defer="defer"></script>
-    {%- endif -%}
-
-    {%- if settings.predictive_search_enabled -%}
-      <link
-        rel="stylesheet"
-        href="{{ 'component-predictive-search.css' | asset_url }}"
-        media="print"
-        onload="this.media='all'"
-      >
-    {%- endif -%}
+      {%- if settings.predictive_search_enabled -%}
+        <link
+          rel="stylesheet"
+          href="{{ 'component-predictive-search.css' | asset_url }}"
+          media="print"
+          onload="this.media='all'"
+        >
+      {%- endif -%}
+    {%- endunless -%}
 
     <script>
       if (Shopify.designMode) {
@@ -314,7 +324,9 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.23.0/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.23.0/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="{{ 'base.css' | asset_url }}">
+    {%- unless template contains 'lp-' -%}
+      <link rel="stylesheet" href="{{ 'base.css' | asset_url }}">
+    {%- endunless -%}
     <script src="{{ 'shopify.edit.js' | asset_url }}" defer type="text/babel"></script>
     <script src="{{ 'shopify.kaching.js' | asset_url }}" defer type="text/babel"></script>
   </head>

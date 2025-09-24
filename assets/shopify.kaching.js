@@ -1,9 +1,23 @@
 setTimeout(() => {
+    const containerList = document.querySelectorAll('.kaching-bundles__bar-container');
+    containerList.forEach(container => {
+        const listFreeGift = container.querySelectorAll('.kaching-bundles__free-gift');
+        listFreeGift.forEach((gift, index) => {
+            if (index > 0) {
+                gift.style.setProperty("display", "none", "important");
+            } else {
+                gift.style.setProperty("display", "flex", "important");
+            }
+        });
+    });
+}, 1000);
+
+setTimeout(() => {
     if (window.location.pathname.includes("/products/")) {
         const katChingBundlePar = document.querySelector("kaching-bundle");
         if (!katChingBundlePar) return;
         const id = katChingBundlePar.getAttribute("product-id");
-        if (!id) return;
+        if (!id || !window.productData) return;
         if (id != productData.id) return;
         const katChingBundleBlock = katChingBundlePar.querySelector("kaching-bundles-block");
 
@@ -19,6 +33,12 @@ setTimeout(() => {
 }, 2000);
 
 function formatMoney(cents, format = Shopify.currency.active, isTruncate = false) {
+    const formatter = new Intl.NumberFormat(format, {
+        style: 'currency',
+        currency: format,
+        trailingZeroDisplay: 'stripIfInteger'
+    });
+
     if (typeof cents === "string") {
         cents = cents.replace(".", "");
     }
@@ -53,7 +73,7 @@ function formatMoney(cents, format = Shopify.currency.active, isTruncate = false
     }
 
     const match = formatString.match(placeholderRegex);
-    if (!match) return cents + " " + Shopify.currency.active;
+    if (!match) return formatter.format(cents);
 
     switch (match[1]) {
         case "amount":
@@ -110,6 +130,9 @@ function HandleDealBarItem(productRoot, index, dealBars) {
     const addToCartButton = productRoot.querySelector(".add-to-cart-button");
     const priceDiscountTextWp = productRoot.querySelector(".price-discount-text-wp");
     const variantSelectWrapper = productRoot.querySelector(".variant-select-wrapper");
+    const regularPrice = document.querySelector(".regular-price");
+    const savePriceText = document.querySelector(".save-price-text");
+    const todayPrice = document.querySelector(".today-price");
     const imageRender = productRoot.querySelector("img");
 
     if (!priceOriginal || !priceDiscount || !priceDiscountText || !addToCartButton || !priceDiscountTextWp || !variantSelectWrapper || !imageRender) return;
@@ -119,6 +142,9 @@ function HandleDealBarItem(productRoot, index, dealBars) {
     const handleShowPrice = (price) => {
         if (dealBar.discountType !== "default") {
             priceOriginal.textContent = formatMoney(price * dealBar.quantity);
+            regularPrice.textContent = formatMoney(price * dealBar.quantity);
+            todayPrice.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
+            savePriceText.textContent = `Save ${formatMoney(price * dealBar.quantity - handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity)} (${dealBar.discountValue}%)`;
             priceDiscount.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
             priceDiscountText.textContent = `Save ${formatMoney(price * dealBar.quantity - handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity)} (${dealBar.discountValue}%)`;
         } else {
@@ -161,6 +187,43 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
         if (!variantActive) return;
 
         const handleClick = async (lineItems) => {
+            const lines = [
+                {
+                    quantity: dealBar.quantity,
+                    merchandiseId: `gid://shopify/ProductVariant/${variantActive}`,
+                    attributes: [
+                        {
+                            key: "__kaching_bundles",
+                            value: JSON.stringify({
+                                deal: dealBar.id,
+                                main: true
+                            })
+                        }
+                    ]
+                }
+            ];
+
+            if (dealBar.freeGifts && dealBar.freeGifts.length > 0) {
+                dealBar.freeGifts.forEach(gift => {
+                    if (gift.variantGID) {
+                        lines.push({
+                            quantity: gift.quantity || 1,
+                            merchandiseId: gift.variantGID,
+                            attributes: [
+                                {
+                                    key: "__kaching_bundles",
+                                    value: JSON.stringify({
+                                        id: gift.id,
+                                        deal: dealBar.id,
+                                        gift: gift.id,
+                                    })
+                                }
+                            ]
+                        });
+                    }
+                });
+            }
+
             return await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
                 method: "POST",
                 headers: {
@@ -186,21 +249,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
                         }`,
                     variables: {
                         input: {
-                            lines: [
-                                {
-                                    quantity: dealBar.quantity,
-                                    merchandiseId: `gid://shopify/ProductVariant/${variantActive}`,
-                                    attributes: [
-                                        {
-                                            key: "__kaching_bundles",
-                                            value: JSON.stringify({
-                                                deal: dealBar.id,
-                                                main: true
-                                            })
-                                        }
-                                    ]
-                                }
-                            ],
+                            lines: lines,
                         }
                     }
                 })
@@ -224,11 +273,29 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
         };
     }, [variantActive, productData, dealBar]);
 
-    return <>
-        <select onChange={(e) => setVariantActive(e.target.value)} value={variantActive} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-            {productData?.variants?.map((variant) => (
-                <option value={variant.id} selected={variant.id === variantActive}>{variant.title}</option>
-            ))}
-        </select>
-    </>
+    return <div class="space-y-2 mb-3">
+        {
+            (productData.options.length > 1 || (productData.options.length === 1 && productData.options[0].value.length > 0)) && (
+                productData.options.map((options, index) => {
+                    return (
+                        <select select key={index} onChange={(e) => {
+                            const value = e.target.value;
+                            const variant = productData.variants.find(variant => {
+                                const newValue = variant.title.split(" / ");
+                                newValue[index] = value;
+                                return newValue.join(" / ") === variant.title;
+                            });
+                            if (variant) {
+                                setVariantActive(variant.id);
+                            }
+                        }} value={productData.variants.find(variant => variant.id === variantActive)?.title?.split(" / ")[index]} data-value-selected={productData.variants.find(variant => variant.id === variantActive)?.title?.split(" / ")[index]} class={`bg-gray-50 border border-gray-300 text-[#333] text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${options.values.length == 1 ? "!hidden" : ""}`}>
+                            {options?.values?.map((option) => (
+                                <option value={option}>{option}</option>
+                            ))}
+                        </select>
+                    )
+                })
+            )
+        }
+    </div >
 }

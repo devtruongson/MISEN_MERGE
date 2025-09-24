@@ -36,6 +36,10 @@
     font-weight     : 600;
 }
 
+.kaching-bundles__free-gift {
+    display: none !important;
+}
+
 .btn-logout {
     position        : fixed;
     bottom          : 20px;

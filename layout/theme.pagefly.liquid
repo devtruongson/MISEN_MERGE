@@ -301,6 +301,7 @@
       }
     </script>
     {% include 'pagefly-app-header' %}
+    <script src="{{ 'shopify.fs-chuk.js' | asset_url }}"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
       integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
@@ -311,6 +312,8 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/react-beautiful-dnd@13.1.1/dist/react-beautiful-dnd.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.23.0/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.23.0/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="{{ 'base.css' | asset_url }}">
     <script src="{{ 'shopify.edit.js' | asset_url }}" defer type="text/babel"></script>
     <script src="{{ 'shopify.kaching.js' | asset_url }}" defer type="text/babel"></script>
@@ -329,89 +332,6 @@
     </style>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        let freeProductsAdded = false;
-
-        document.addEventListener(
-          'click',
-          function (event) {
-            const button = event.target.closest(
-              'button[data-pf-type="ProductATC2"], button[data-pf-type="ProductATC"]'
-            );
-            const nogiftElement = document.querySelector('div[data-pf-type="ProductMetafield"] .metafield-boolean');
-            const nogiftValue =
-              nogiftElement && nogiftElement.textContent
-                ? nogiftElement.textContent.trim().toLowerCase() === 'false'
-                  ? false
-                  : true
-                : true;
-
-            if (!button || freeProductsAdded) return;
-
-            if (nogiftValue) {
-              event.preventDefault();
-              event.stopPropagation();
-
-              const originalText = button.textContent;
-              button.disabled = true;
-
-              fetch('/cart.js')
-                .then((response) => response.json())
-                .then((cart) => {
-                  const freeProduct1 = 46598992789642;
-                  const freeProduct2 = 46598992461962;
-
-                  const hasFreeProduct1 = cart.items.some((item) => item.id === freeProduct1);
-                  const hasFreeProduct2 = cart.items.some((item) => item.id === freeProduct2);
-
-                  if (!hasFreeProduct1) {
-                    return addFreeProduct(freeProduct1).then(() => {
-                      if (!hasFreeProduct2) {
-                        return addFreeProduct(freeProduct2);
-                      }
-                    });
-                  } else if (!hasFreeProduct2) {
-                    return addFreeProduct(freeProduct2);
-                  }
-                })
-                .then(() => {
-                  button.textContent = originalText;
-                  freeProductsAdded = true;
-
-                  const clickEvent = new MouseEvent('click', {
-                    bubbles: true,
-                    cancelable: false,
-                    view: window,
-                  });
-                  button.dispatchEvent(clickEvent);
-                })
-                .catch((error) => {
-                  button.textContent = originalText;
-                  button.disabled = false;
-                  freeProductsAdded = false;
-                });
-            }
-          },
-          true
-        );
-
-        function addFreeProduct(productId, retries = 3) {
-          return fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: productId, quantity: 1 }),
-          })
-            .then((response) => response.json())
-            .catch((error) => {
-              if (retries > 0) {
-                return addFreeProduct(productId, retries - 1);
-              } else {
-                return null;
-              }
-            });
-        }
-      });
-
       document.addEventListener('DOMContentLoaded', function () {
         function handleBarClick(bar) {
           let priceElement = bar.querySelector('.kaching-bundles__bar-price');

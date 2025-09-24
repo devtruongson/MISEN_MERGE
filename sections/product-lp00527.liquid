@@ -2649,13 +2649,11 @@
           <h3 class="text-center text-2xl font-bold text-slate-900 mb-8" data-meta="customer_photos_title">
             {{ template_data.customer_photos_title }}
           </h3>
-          <div class="review-images-grid">
+          <div class="review-images-grid" data-meta="customer_photos_grid" data-type="gallery">
             <div class="relative rounded-xl overflow-hidden shadow-lg">
               <img
                 src="{{ template_data.customer_photo_1 }}"
                 alt=""
-                data-meta="customer_photo_1"
-                data-type="image"
                 class="w-full h-full object-cover aspect-square"
               >
             </div>

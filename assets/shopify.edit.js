@@ -22,7 +22,7 @@ loadingOverlay.className = `
 `;
 loadingOverlay.innerHTML = `
   <div class="flex flex-col items-center gap-4 text-white">
-    <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+    <div class="!animate-spin !block !rounded-full h-12 w-12 !border-4 !border-white !border-t-transparent"></div>
     <span class="text-lg font-medium">Vui lòng chờ...</span>
   </div>
 `;
@@ -62,7 +62,6 @@ async function fetchUrlToBase64(url, opts = {}) {
     return dataUrl ? `data:${contentType};base64,${base64}` : base64;
 }
 
-
 const checkToken = localStorage.getItem("shopify_misen_login");
 if (checkToken) {
     const btnLogout = document.createElement("button");
@@ -70,10 +69,18 @@ if (checkToken) {
     btnLogout.classList.add("btn-logout");
     body.appendChild(btnLogout);
     btnLogout.addEventListener("click", () => {
-        const constfirm = window.confirm("Are you sure to logout?");
-        if (!constfirm) return;
-        localStorage.removeItem("shopify_misen_login");
-        window.location.reload();
+        const constfirm = Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out from Misen Edit!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, logout!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem("shopify_misen_login");
+                window.location.reload();
+            }
+        })
     });
 
     elements.forEach(el => {
@@ -88,8 +95,13 @@ if (checkToken) {
             const uniqueKey = metaKeys.length > 1 ? `${metaKey}_${index}` : metaKey;
 
             if (!typeMeta) {
-                valuesDefault[uniqueKey] = el.innerText;
-                newValues[uniqueKey] = el.innerText;
+                if (el.tagName.includes("INPUT") || el.tagName.includes("I") || el.tagName.includes("TEXTAREA") || el.tagName.includes("SELECT") || el.tagName.includes("A") || el.tagName.includes("IMG")) {
+                    valuesDefault[uniqueKey] = el.innerText;
+                    newValues[uniqueKey] = el.innerText;
+                } else {
+                    valuesDefault[uniqueKey] = el.innerHTML;
+                    newValues[uniqueKey] = el.innerHTML;
+                }
             } else if (typeMeta === "icon") {
                 const iconClass = el.className.split(' ').find(c => c.startsWith('fa-'))?.substring(3) || '';
                 valuesDefault[uniqueKey] = iconClass;
@@ -178,7 +190,11 @@ if (checkToken) {
                     metaKeys.forEach((metaKey, index) => {
                         if (!metaKey.trim()) return;
                         const uniqueKey = metaKeys.length > 1 ? `${metaKey}_${index}` : metaKey;
-                        newValues[uniqueKey] = event.target.innerText;
+                        if (el.tagName.includes("INPUT") || el.tagName.includes("I") || el.tagName.includes("TEXTAREA") || el.tagName.includes("SELECT") || el.tagName.includes("A") || el.tagName.includes("IMG")) {
+                            newValues[uniqueKey] = event.target.innerText;
+                        } else {
+                            newValues[uniqueKey] = event.target.innerHTML;
+                        }
                     });
 
                     if (!_.isEqual(valuesDefault, newValues)) {
@@ -195,57 +211,65 @@ if (checkToken) {
 }
 
 async function handleUpdateMetaFields() {
-    const confirm = window.confirm("Are you sure you want to update the product?");
-    if (!confirm) return;
-
-    // Map lại từ unique keys về original meta keys
-    const mappedMetafields = {};
-    Object.keys(newValues).forEach(uniqueKey => {
-        // Tìm element có chứa uniqueKey này
-        const elements = document.querySelectorAll('[data-meta]');
-        elements.forEach(el => {
-            const metaKeys = el.getAttribute("data-meta")?.split(' ') || [];
-            metaKeys.forEach((metaKey, index) => {
-                if (!metaKey.trim()) return;
-                const expectedUniqueKey = metaKeys.length > 1 ? `${metaKey}_${index}` : metaKey;
-                if (expectedUniqueKey === uniqueKey) {
-                    // Sử dụng key gốc thay vì unique key
-                    mappedMetafields[metaKey] = newValues[uniqueKey];
-                }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Are you sure you want to update the product?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, update it!'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            // Map lại từ unique keys về original meta keys
+            const mappedMetafields = {};
+            Object.keys(newValues).forEach(uniqueKey => {
+                // Tìm element có chứa uniqueKey này
+                const elements = document.querySelectorAll('[data-meta]');
+                elements.forEach(el => {
+                    const metaKeys = el.getAttribute("data-meta")?.split(' ') || [];
+                    metaKeys.forEach((metaKey, index) => {
+                        if (!metaKey.trim()) return;
+                        const expectedUniqueKey = metaKeys.length > 1 ? `${metaKey}_${index}` : metaKey;
+                        if (expectedUniqueKey === uniqueKey) {
+                            // Sử dụng key gốc thay vì unique key
+                            mappedMetafields[metaKey] = newValues[uniqueKey];
+                        }
+                    });
+                });
             });
-        });
-    });
 
-    console.log("check new save: ", {
-        token: localStorage.getItem("shopify_misen_login"),
-        metafields: mappedMetafields,
-        product: productData,
-        domain: Shopify.shop,
-    });
-
-    try {
-        document.body.appendChild(loadingOverlay);
-        const res = await fetch("https://n8n.misencorp.com/webhook/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                token: localStorage.getItem("shopify_misen_login"),
-                metafields: mappedMetafields,
-                product: productData,
-                domain: Shopify.shop,
-            }),
-        });
-        const data = await res.json();
-        if (data.code === 0) {
-            btnSaveChange.style.display = "none";
+            try {
+                document.body.appendChild(loadingOverlay);
+                const res = await fetch("https://n8n.misencorp.com/webhook/update", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        token: localStorage.getItem("shopify_misen_login"),
+                        metafields: mappedMetafields,
+                        product: productData,
+                        domain: Shopify.shop,
+                    }),
+                });
+                const data = await res.json();
+                if (data.code === 0) {
+                    btnSaveChange.style.display = "none";
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Metafields updated successfully',
+                        icon: 'success',
+                        confirmButtonText: 'Oke'
+                    })
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+            } finally {
+                loadingOverlay.remove();
+            }
         }
-    } catch (error) {
-        console.error("Error during login:", error);
-    } finally {
-        loadingOverlay.remove();
-    }
+    })
+
+
 }
 
 function onModalLoginMisen() {
@@ -279,12 +303,25 @@ function FormLogin() {
             });
             const data = await res.json();
             if (data.code != 0) {
-                alert(data.msg || "Login failed");
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Password or username is incorrect',
+                    icon: 'error',
+                    confirmButtonText: 'Cool'
+                })
             } else {
+                document.getElementById("react-modal-root").style.display = "none";
                 localStorage.setItem("shopify_misen_login", data.token);
-                alert("Login successful");
-                const url = window.location.origin + window.location.pathname + window.location.hash;
-                window.location.href = url;
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Login successful',
+                    icon: 'success',
+                    confirmButtonText: 'Okey'
+                }).then(() => {
+                    const url = window.location.origin + window.location.pathname + window.location.hash;
+                    window.location.href = url;
+                })
+
             }
         } catch (error) {
             console.error("Error during login:", error);
@@ -552,13 +589,17 @@ function openGalleryModal(metaKey) {
                         if (!elImage) {
                             elImage = document.createElement("img");
                         }
-                        const className = elImage.getAttribute("class") || "";
                         elContainer.innerHTML = "";
                         images.forEach((file) => {
+                            const div = document.createElement("div");
+                            div.classList.add("relative", "rounded-xl", "overflow-hidden", "shadow-lg");
+
                             const img = document.createElement("img");
-                            img.className = className;
+                            img.classList.add("w-full", "h-full", "object-cover", "aspect-square");
                             img.src = file.url;
-                            elContainer.appendChild(img);
+
+                            div.appendChild(img);
+                            elContainer.appendChild(div);
                         });
                     }
                 });
@@ -644,10 +685,7 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
     };
 
     const [formData, setFormData] = useState({
-        // Instruction Settings
         isUseInstruction: true,
-
-        // Product Info - đọc từ productData
         brandName: productData?.brandName || '',
         productName: productData?.title || '',
         productCategory: productData?.productCategory || '',
@@ -831,7 +869,7 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
 
         try {
             const config = window.AI_CONFIG || {
-                apiEndpoint: 'https://n8n.misencorp.com/webhook/gen-images',
+                apiEndpoint: 'https://n8n.misencorp.com/webhook/generate-ai-image',
                 requestConfig: {
                     method: 'POST',
                     headers: {
@@ -862,10 +900,8 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
 
             // Tạo data object đơn giản theo yêu cầu - chỉ là key-value string
             const simpleData = {
-                // Instruction Settings
                 isUseInstruction: formData.isUseInstruction.toString(),
 
-                // Product Info
                 brandName: formData.brandName,
                 productName: formData.productName,
                 productCategory: formData.productCategory,
@@ -875,14 +911,12 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
                 targetCustomer: getAutoValue('targetCustomer', formData.targetCustomer),
                 priceRange: getAutoValue('priceRange', formData.priceRange),
 
-                // Section Configuration
                 sectionName: getAutoValue('sectionName', formData.sectionName),
                 sectionDescription: formData.sectionDescription,
                 contentGoal: getAutoValue('contentGoal', formData.contentGoal),
                 visualStyle: getAutoValue('visualStyle', formData.visualStyle),
                 instructionKey: getInstructionKey(),
 
-                // Image Settings
                 imageSize: formData.imageSize,
                 imageResolution: formData.imageResolution,
                 maxImages: formData.maxImages,
@@ -924,10 +958,11 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
             const processedImages = [];
             if (Array.isArray(data)) {
                 data.forEach(item => {
-                    if (item.url) {
-                        processedImages.push({
-                            url: item.url,
-                            revised_prompt: item.revised_prompt || prompt
+                    if (item.images && Array.isArray(item.images)) {
+                        item.images.forEach(img => {
+                            processedImages.push({
+                                url: img.url,
+                            });
                         });
                     }
                 });
@@ -1038,9 +1073,25 @@ const ImageGeneratorModal = ({ uniqueKey, onSelectImage, onClose }) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [lightboxOpen, refLightboxOpen]);
 
+    useEffect(() => {
+        if (isMinimized) {
+            const imageList = document.querySelectorAll("[data-meta]");
+            imageList.forEach(img => {
+                img.style.pointerEvents = "none";
+            });
+        }
+
+        return () => {
+            const imageList = document.querySelectorAll("[data-meta]");
+            imageList.forEach(img => {
+                img.style.pointerEvents = "auto";
+            });
+        };
+    }, [isMinimized]);
+
     return (
         <div className={`fixed inset-0 z-[9999] transition-all duration-300 ${isMinimized
-            ? 'bg-transparent backdrop-blur-none flex items-end justify-center pb-4'
+            ? 'bg-transparent backdrop-blur-none flex items-end justify-center pb-4 h-[140px]'
             : 'bg-black/60 backdrop-blur-sm flex items-center justify-center p-4'
             }`}>
             <div className={`bg-white shadow-2xl w-full overflow-hidden border border-gray-100 transition-all duration-300 ${isMinimized
@@ -2070,7 +2121,7 @@ function ImageEditModal({ metaKeys, currentValues, element, onSave, onClose }) {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => openImageGeneratorModal(uniqueKey)}
-                                                                className="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 group"
+                                                                className="flex !hidden items-center justify-center px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 group"
                                                             >
                                                                 <svg className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -2103,7 +2154,7 @@ function ImageEditModal({ metaKeys, currentValues, element, onSave, onClose }) {
                                                         type="text"
                                                         value={values[`${uniqueKey}_alt`] || ''}
                                                         onChange={(e) => handleInputChange(`${uniqueKey}_alt`, e.target.value)}
-                                                        className="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                                        className="w-full px-4 py-3 border border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all hidden"
                                                         placeholder="Describe the image for screen readers and SEO..."
                                                     />
                                                     <p className="text-xs text-gray-500">
@@ -2159,7 +2210,7 @@ function ImageEditModal({ metaKeys, currentValues, element, onSave, onClose }) {
                                                     <button
                                                         type="button"
                                                         onClick={() => openImageGeneratorModal(uniqueKey)}
-                                                        className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm"
+                                                        className="flex-1 !hidden px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm"
                                                     >
                                                         AI Generate
                                                     </button>
@@ -2170,7 +2221,7 @@ function ImageEditModal({ metaKeys, currentValues, element, onSave, onClose }) {
                                 );
                             } else if (metaKey.includes('alt')) {
                                 return (
-                                    <div key={uniqueKey} className="bg-green-50 rounded-2xl p-6 border border-green-200">
+                                    <div key={uniqueKey} className="bg-green-50 hidden rounded-2xl p-6 border border-green-200">
                                         <div className="flex items-center mb-4">
                                             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                                                 <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

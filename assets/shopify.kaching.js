@@ -162,16 +162,16 @@ function HandleDealBarItem(productRoot, index, dealBars) {
         }
     }
 
-    HandleVariantSelect(variantSelectWrapper, imageRender, handleShowPrice, addToCartButton, dealBar)
+    HandleVariantSelect(variantSelectWrapper, imageRender, handleShowPrice, addToCartButton, dealBar, index)
 
 }
 
-function HandleVariantSelect(variantSelectWrapper, imageRender, handleShowPrice, addToCartButton, dealBar) {
+function HandleVariantSelect(variantSelectWrapper, imageRender, handleShowPrice, addToCartButton, dealBar, index) {
     const variantSelect = ReactDOM.createRoot(variantSelectWrapper);
-    variantSelect.render(<VariantSelect imageRender={imageRender} handleShowPrice={handleShowPrice} addToCartButton={addToCartButton} dealBar={dealBar} />);
+    variantSelect.render(<VariantSelect imageRender={imageRender} handleShowPrice={handleShowPrice} addToCartButton={addToCartButton} dealBar={dealBar} countOffer={index + 1} />);
 }
 
-function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar }) {
+function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar , countOffer}) {
     const [variantActive, setVariantActive] = React.useState(null);
     const [openDropdown, setOpenDropdown] = React.useState(null); // Changed to single value
 

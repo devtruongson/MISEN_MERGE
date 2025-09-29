@@ -1,0 +1,2553 @@
+{% comment %} Template: VoiceAI Pro X1 - Professional AI Voice Recorder {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ template_data.page_title }}</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        * {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        html {
+            font-size: unset !important;
+        }
+
+        body {
+            font-size: unset !important;
+        }
+        
+        body {
+            font-size: 18px;
+            line-height: 1.7;
+        }
+        
+        .mono-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #10b981 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .dark-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        .emerald-glow {
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);
+        }
+        
+        @keyframes slide-in {
+            from { 
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .slide-in {
+            animation: slide-in 0.6s ease-out;
+        }
+        
+        @keyframes float-smooth {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .float-smooth {
+            animation: float-smooth 5s ease-in-out infinite;
+        }
+        
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: #10b981;
+            z-index: 9999;
+            transition: width 0.2s linear;
+        }
+        
+        .modern-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 2rem;
+        }
+        
+        .modern-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: #10b981;
+        }
+        
+        .minimal-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: #0f172a;
+            color: white;
+            padding: 20px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 360px;
+            transform: translateX(-400px);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+            border-left: 3px solid #10b981;
+        }
+        
+        .minimal-notification.show {
+            transform: translateX(0);
+        }
+        
+        .minimal-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .minimal-popup.active {
+            display: flex;
+        }
+        
+        .cta-primary {
+            background: #10b981;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 18px;
+            padding: 16px 32px;
+        }
+        
+        .cta-primary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .cta-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .cta-primary:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .cta-secondary {
+            background: transparent;
+            border: 2px solid #0f172a;
+            color: #0f172a;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            padding: 16px 32px;
+        }
+        
+        .cta-secondary:hover {
+            background: #0f172a;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .dot-pattern {
+            background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .tech-badge {
+            background: #f59e0b;
+            color: #0f172a;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        section {
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+        }
+        
+        h1, h2, h3, h4 {
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+    </style>
+
+    <script>
+      window.productData = {
+            id: '{{ product.id }}',
+            title: '{{ product.title | escape }}',
+            handle: '{{ product.handle }}',
+            price: {{ product.price }},
+            compare_at_price: {% if product.compare_at_price %}{{ product.compare_at_price }}{% else %}''{% endif %},
+            available: {{ product.available }},
+            image: "{{ product.featured_image | image_url: width: 100 }}",
+            variants: [
+              {% for variant in product.variants %}
+              {
+                id: {{ variant.id }},
+                title: "{{ variant.title | escape }}",
+                price: {{ variant.price }},
+                available: {{ variant.available }},
+                quantity: {{ variant.inventory_quantity }},
+                image: {% if variant.image %}"{{ variant.image | image_url: width: 100 }}"{% else %}""{% endif %}
+              }{% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            ],
+            options: {{ product.options_with_values | json }},
+            selected_or_first_available_variant: {{ product.selected_or_first_available_variant | json }},
+            featuredImage: {
+              url: '{{ product.featured_image | image_url: width: 1000 }}'
+            },
+            collections: {{ product.collections | json }},
+            brandName: '{{ product.vendor | escape }}',
+            productCategory: '{{ product.type | escape }}',
+            productType: '{{ product.metafields.custom.product_type | escape }}',
+            mainUSP: '{{ product.metafields.custom.usp | escape }}',
+            productSize: '{{ product.metafields.custom.size | escape }}',
+            targetCustomer: '{{ product.metafields.custom.target | escape }}',
+            priceRange: '{{ product.metafields.custom.price_range | escape }}',
+            availableReferenceImages: {{ product.metafields.custom.reference_images | json }}
+          };
+    </script>
+    {% assign template_data = product.metafields.custom.template_data.value | parse_json %}
+</head>
+<body class="bg-white">
+    
+    <div id="reading-progress" style="width: 0%;"></div>
+    
+    <div class="bg-black text-white py-3">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center text-base">
+                <span class="mono-text" data-meta="top_bar_text">
+                    {{ template_data.top_bar_text }}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-black rounded flex items-center justify-center">
+                        <i class="fas fa-{{ template_data.logo_icon }} text-emerald-400 text-xl" data-meta="logo_icon" data-type="icon"></i>
+                    </div>
+                    <span class="text-2xl font-bold" data-meta="brand_name">{{ template_data.brand_name }}</span>
+                    <span class="tech-badge" data-meta="product_badge">{{ template_data.product_badge }}</span>
+                </div>
+                
+                <nav class="hidden lg:flex items-center space-x-10">
+                    <a href="{{ template_data.nav_link_1 }}" class="text-gray-600 hover:text-black transition font-medium text-lg" data-meta="nav_link_1 nav_text_1">{{ template_data.nav_text_1 }}</a>
+                    <a href="{{ template_data.nav_link_2 }}" class="text-gray-600 hover:text-black transition font-medium text-lg" data-meta="nav_link_2 nav_text_2">{{ template_data.nav_text_2 }}</a>
+                    <a href="{{ template_data.nav_link_3 }}" class="text-gray-600 hover:text-black transition font-medium text-lg" data-meta="nav_link_3 nav_text_3">{{ template_data.nav_text_3 }}</a>
+                    <a href="{{ template_data.nav_link_4 }}" class="text-gray-600 hover:text-black transition font-medium text-lg" data-meta="nav_link_4 nav_text_4">{{ template_data.nav_text_4 }}</a>
+                    <a href="{{ template_data.cta_link_header }}" class="cta-primary px-8 py-3 rounded font-semibold" data-meta="cta_link_header cta_text_header">
+                        {{ template_data.cta_text_header }}
+                    </a>
+                </nav>
+
+                
+                <button id="mobile-menu-btn" class="lg:hidden">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <nav id="mobile-menu" class="hidden lg:hidden py-6 border-t">
+                <a href="{{ template_data.nav_link_1 }}" class="block py-3 text-gray-600 text-lg" data-meta="mobile_nav_link_1 mobile_nav_text_1">{{ template_data.mobile_nav_text_1 }}</a>
+                <a href="{{ template_data.nav_link_2 }}" class="block py-3 text-gray-600 text-lg" data-meta="mobile_nav_link_2 mobile_nav_text_2">{{ template_data.mobile_nav_text_2 }}</a>
+                <a href="{{ template_data.nav_link_3 }}" class="block py-3 text-gray-600 text-lg" data-meta="mobile_nav_link_3 mobile_nav_text_3">{{ template_data.mobile_nav_text_3 }}</a>
+                <a href="{{ template_data.nav_link_4 }}" class="block py-3 text-gray-600 text-lg" data-meta="mobile_nav_link_4 mobile_nav_text_4">{{ template_data.mobile_nav_text_4 }}</a>
+                <a href="{{ template_data.cta_link_mobile }}" class="block py-3 text-emerald-600 font-semibold text-lg" data-meta="cta_link_mobile cta_text_mobile">{{ template_data.cta_text_mobile }}</a>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="min-h-screen flex items-center relative overflow-hidden py-24">
+        <div class="absolute inset-0 dot-pattern opacity-50"></div>
+        
+        <div class="container mx-auto px-4 relative">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                
+                <div>
+                    <div class="inline-flex items-center space-x-3 mb-8">
+                        <span class="bg-emerald-100 text-emerald-700 px-4 py-2 rounded text-base font-semibold" data-meta="hero_badge">
+                            {{ template_data.hero_badge }}
+                        </span>
+                        <span class="text-gray-500 text-base" data-meta="hero_badge_subtitle">{{ template_data.hero_badge_subtitle }}</span>
+                    </div>
+                    
+                    <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-8 leading-tight" data-meta="hero_headline">
+                        {{ template_data.hero_headline }}
+                    </h1>
+                    
+                    <p class="text-2xl text-gray-600 mb-10 leading-relaxed hero-description" data-meta="hero_description">
+                        {{ template_data.hero_description }}
+                    </p>
+                    
+                    <div class="hero-image-container mb-10">
+                        <div class="relative">
+                            <img src="{{ template_data.hero_image_mobile }}" 
+                                 alt="Create transformation image: Professional using advanced voice recorder in modern office setting with visual waves representing AI transcription. Text Overlay: 'Never Miss a Word'. Visual Style: Premium tech lifestyle. Color Psychology: Trust blue meets action emerald. CTA: Voice waves transforming into text." 
+                                 class="w-full aspect-[4/5] object-cover rounded-2xl shadow-2xl" data-meta="hero_image_mobile" data-type="image">
+                            
+                            <div class="absolute -top-4 -right-4 bg-amber-400 text-black px-4 py-2 rounded-lg font-bold shadow-lg" data-meta="hero_discount_badge">
+                                {{ template_data.hero_discount_badge }}
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-10 hero-specs">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.spec_icon_1 }} text-gray-700 text-xl" data-meta="spec_icon_1" data-type="icon"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500" data-meta="spec_label_1">{{ template_data.spec_label_1 }}</p>
+                                <p class="font-semibold text-base" data-meta="spec_value_1">{{ template_data.spec_value_1 }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.spec_icon_2 }} text-gray-700 text-xl" data-meta="spec_icon_2" data-type="icon"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500" data-meta="spec_label_2">{{ template_data.spec_label_2 }}</p>
+                                <p class="font-semibold text-base" data-meta="spec_value_2">{{ template_data.spec_value_2 }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.spec_icon_3 }} text-gray-700 text-xl" data-meta="spec_icon_3" data-type="icon"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500" data-meta="spec_label_3">{{ template_data.spec_label_3 }}</p>
+                                <p class="font-semibold text-base" data-meta="spec_value_3">{{ template_data.spec_value_3 }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.spec_icon_4 }} text-gray-700 text-xl" data-meta="spec_icon_4" data-type="icon"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500" data-meta="spec_label_4">{{ template_data.spec_label_4 }}</p>
+                                <p class="font-semibold text-base" data-meta="spec_value_4">{{ template_data.spec_value_4 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 mb-10">
+                        <a href="{{ template_data.hero_cta_primary_link }}" class="cta-primary px-10 py-4 rounded font-semibold text-center text-lg relative overflow-hidden" data-meta="hero_cta_primary_link hero_cta_primary_text">
+                            {{ template_data.hero_cta_primary_text }}
+                        </a>
+                        <a href="{{ template_data.hero_cta_secondary_link }}" class="cta-secondary px-10 py-4 rounded font-semibold text-center text-lg" data-meta="hero_cta_secondary_link hero_cta_secondary_text">
+                            {{ template_data.hero_cta_secondary_text }}
+                        </a>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 mb-10 items-center space-x-0 md:space-x-8">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex text-amber-400">
+                                <i class="fas fa-{{ template_data.star_icon}} text-lg"></i>
+                                <i class="fas fa-{{ template_data.star_icon}} text-lg"></i>
+                                <i class="fas fa-{{ template_data.star_icon}} text-lg"></i>
+                                <i class="fas fa-{{ template_data.star_icon}} text-lg"></i>
+                                <i class="fas fa-{{ template_data.star_icon}} text-lg"></i>
+                            </div>
+                            <span class="text-lg font-semibold ml-2" data-meta="hero_rating">{{ template_data.hero_rating }}</span>
+                            <span class="text-base text-gray-500" data-meta="hero_reviews_count">{{ template_data.hero_reviews_count }}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-{{ template_data.hero_trust_icon }} text-emerald-600 text-xl" data-meta="hero_trust_icon" data-type="icon"></i>
+                            <span class="text-base text-gray-600" data-meta="hero_trust_text">{{ template_data.hero_trust_text }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hidden lg:block"></div>
+            </div>
+        </div>
+        
+        <style>
+            @media (min-width: 1024px) {
+                .hero-image-container {
+                    display: none !important;
+                }
+            }
+            
+            @media (min-width: 1024px) {
+                .hero-image-container {
+                    display: block !important;
+                    position: absolute;
+                    right: 0;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 50%;
+                    max-width: 600px;
+                    padding-right: 2rem;
+                }
+            }
+            
+            @media (max-width: 1023px) {
+                .hero-image-container {
+                    display: block !important;
+                    order: -1;
+                }
+                
+                .hero-description {
+                    order: -2;
+                }
+                
+                .hero-specs {
+                    order: 1;
+                }
+            }
+        </style>
+    </section>
+    
+    <section class="py-24 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="mono-text text-gray-500" data-meta="problem_section_label">{{ template_data.problem_section_label }}</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-6" data-meta="problem_headline">
+                        {{ template_data.problem_headline }}
+                    </h2>
+                    <p class="text-2xl text-gray-600 leading-relaxed" data-meta="problem_subheadline">
+                        {{ template_data.problem_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="modern-card rounded-xl p-8">
+                        <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-6">
+                            <i class="fas fa-{{ template_data.problem_1_icon }} text-red-500 text-3xl" data-meta="problem_1_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3" data-meta="problem_1_title">{{ template_data.problem_1_title }}</h3>
+                        <p class="text-gray-600 text-base mb-6 leading-relaxed" data-meta="problem_1_description">
+                            {{ template_data.problem_1_description }}
+                        </p>
+                        <div class="pt-6 border-t">
+                            <span class="text-3xl font-bold" data-meta="problem_1_stat_value">{{ template_data.problem_1_stat_value }}</span>
+                            <span class="text-base text-gray-500 block mt-1" data-meta="problem_1_stat_label">{{ template_data.problem_1_stat_label }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="modern-card rounded-xl p-8">
+                        <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-6">
+                            <i class="fas fa-{{ template_data.problem_2_icon }} text-orange-500 text-3xl" data-meta="problem_2_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3" data-meta="problem_2_title">{{ template_data.problem_2_title }}</h3>
+                        <p class="text-gray-600 text-base mb-6 leading-relaxed" data-meta="problem_2_description">
+                            {{ template_data.problem_2_description }}
+                        </p>
+                        <div class="pt-6 border-t">
+                            <span class="text-3xl font-bold" data-meta="problem_2_stat_value">{{ template_data.problem_2_stat_value }}</span>
+                            <span class="text-base text-gray-500 block mt-1" data-meta="problem_2_stat_label">{{ template_data.problem_2_stat_label }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="modern-card rounded-xl p-8">
+                        <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-6">
+                            <i class="fas fa-{{ template_data.problem_3_icon }} text-purple-500 text-3xl" data-meta="problem_3_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3" data-meta="problem_3_title">{{ template_data.problem_3_title }}</h3>
+                        <p class="text-gray-600 text-base mb-6 leading-relaxed" data-meta="problem_3_description">
+                            {{ template_data.problem_3_description }}
+                        </p>
+                        <div class="pt-6 border-t">
+                            <span class="text-3xl font-bold" data-meta="problem_3_stat_value">{{ template_data.problem_3_stat_value }}</span>
+                            <span class="text-base text-gray-500 block mt-1" data-meta="problem_3_stat_label">{{ template_data.problem_3_stat_label }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-16">
+                    <p class="text-xl text-gray-600 mb-6" data-meta="problem_cta_text">{{ template_data.problem_cta_text }}</p>
+                    <a href="{{ template_data.problem_cta_link }}" class="text-emerald-600 font-semibold text-lg inline-flex items-center hover:text-emerald-700" data-meta="problem_cta_link problem_cta_link_text">
+                        {{ template_data.problem_cta_link_text }}
+                        <i class="fas fa-arrow-down ml-3"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="solution" class="py-24 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="mono-text text-emerald-600" data-meta="solution_section_label">{{ template_data.solution_section_label }}</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-6" data-meta="solution_headline">
+                        {{ template_data.solution_headline }}
+                    </h2>
+                    <p class="text-2xl text-gray-600 leading-relaxed" data-meta="solution_subheadline">
+                        {{ template_data.solution_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-{{ template_data.solution_feature_1_icon }} text-3xl text-emerald-600" data-meta="solution_feature_1_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="solution_feature_1_title">{{ template_data.solution_feature_1_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="solution_feature_1_description">
+                            {{ template_data.solution_feature_1_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-{{ template_data.solution_feature_2_icon }} text-3xl text-emerald-600" data-meta="solution_feature_2_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="solution_feature_2_title">{{ template_data.solution_feature_2_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="solution_feature_2_description">
+                            {{ template_data.solution_feature_2_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-{{ template_data.solution_feature_3_icon }} text-3xl text-emerald-600" data-meta="solution_feature_3_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="solution_feature_3_title">{{ template_data.solution_feature_3_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="solution_feature_3_description">
+                            {{ template_data.solution_feature_3_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-{{ template_data.solution_feature_4_icon }} text-3xl text-emerald-600" data-meta="solution_feature_4_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="solution_feature_4_title">{{ template_data.solution_feature_4_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="solution_feature_4_description">
+                            {{ template_data.solution_feature_4_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-{{ template_data.solution_feature_5_icon }} text-3xl text-emerald-600" data-meta="solution_feature_5_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="solution_feature_5_title">{{ template_data.solution_feature_5_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="solution_feature_5_description">
+                            {{ template_data.solution_feature_5_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-{{ template_data.solution_feature_6_icon }} text-3xl text-emerald-600" data-meta="solution_feature_6_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="solution_feature_6_title">{{ template_data.solution_feature_6_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="solution_feature_6_description">
+                            {{ template_data.solution_feature_6_description }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900 rounded-2xl p-10 text-white">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                        <div>
+                            <div class="text-4xl font-bold text-emerald-400 mb-2" data-meta="solution_stat_1_value">{{ template_data.solution_stat_1_value }}</div>
+                            <p class="text-base text-gray-400" data-meta="solution_stat_1_label">{{ template_data.solution_stat_1_label }}</p>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-emerald-400 mb-2" data-meta="solution_stat_2_value">{{ template_data.solution_stat_2_value }}</div>
+                            <p class="text-base text-gray-400" data-meta="solution_stat_2_label">{{ template_data.solution_stat_2_label }}</p>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-emerald-400 mb-2" data-meta="solution_stat_3_value">{{ template_data.solution_stat_3_value }}</div>
+                            <p class="text-base text-gray-400" data-meta="solution_stat_3_label">{{ template_data.solution_stat_3_label }}</p>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-emerald-400 mb-2" data-meta="solution_stat_4_value">{{ template_data.solution_stat_4_value }}</div>
+                            <p class="text-base text-gray-400" data-meta="solution_stat_4_label">{{ template_data.solution_stat_4_label }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="mono-text text-sm text-gray-500" data-meta="showcase_section_label">{{ template_data.showcase_section_label }}</span>
+                    <h2 class="text-4xl font-bold text-gray-900 mt-2 mb-4" data-meta="showcase_headline">
+                        {{ template_data.showcase_headline }}
+                    </h2>
+                    <p class="text-xl text-gray-600" data-meta="showcase_subheadline">
+                        {{ template_data.showcase_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="grid lg:grid-cols-5 gap-6">
+                    <div class="lg:col-span-3">
+                        <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                            <div id="gallery-container" class="relative">
+                                <div class="review-images-grid" data-meta="gallery_product_reviews" data-type="gallery"></div>
+                                <script>
+                                        let data  = {{ template_data.gallery_product_reviews | parse_json | json }};
+                                        data = JSON.parse(data);
+                                        if(data && data.length > 0) {
+                                        const html = data.map(image => `
+                                            <div class="relative rounded-xl overflow-hidden shadow-lg">
+                                                <img
+                                                src="${image}"
+                                                loading="lazy"
+                                                alt="Customer wildlife photo"
+                                                class="w-full h-full object-cover aspect-square"
+                                                >
+                                            </div>
+                                            `).join('');
+                                            document.querySelector('.review-images-grid').innerHTML = html;
+                                        }
+                                    </script>
+                                
+                                <button id="gallery-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition">
+                                    <i class="fas fa-chevron-left text-gray-700"></i>
+                                </button>
+                                <button id="gallery-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:bg-white transition">
+                                    <i class="fas fa-chevron-right text-gray-700"></i>
+                                </button>
+                                
+                                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+                                    <button class="gallery-dot w-2 h-2 bg-white rounded-full" data-index="0"></button>
+                                    <button class="gallery-dot w-2 h-2 bg-white/50 rounded-full" data-index="1"></button>
+                                    <button class="gallery-dot w-2 h-2 bg-white/50 rounded-full" data-index="2"></button>
+                                    <button class="gallery-dot w-2 h-2 bg-white/50 rounded-full" data-index="3"></button>
+                                    <button class="gallery-dot w-2 h-2 bg-white/50 rounded-full" data-index="4"></button>
+                                    <button class="gallery-dot w-2 h-2 bg-white/50 rounded-full" data-index="5"></button>
+                                    <button class="gallery-dot w-2 h-2 bg-white/50 rounded-full" data-index="6"></button>
+                                    <button class="gallery-dot w-2 h-2 bg-white/50 rounded-full" data-index="7"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-2">
+                        <div class="bg-black text-white rounded-xl p-6 h-full flex flex-col">
+                            <div class="mb-4">
+                                <h3 class="text-2xl font-bold mb-2" data-meta="showcase_product_name">{{ template_data.showcase_product_name }}</h3>
+                                <div class="flex items-center space-x-2">
+                                    <div class="flex text-amber-400">
+                                        <i class="fas fa-{{ template_data.star_icon}} text-sm"></i>
+                                        <i class="fas fa-{{ template_data.star_icon}} text-sm"></i>
+                                        <i class="fas fa-{{ template_data.star_icon}} text-sm"></i>
+                                        <i class="fas fa-{{ template_data.star_icon}} text-sm"></i>
+                                        <i class="fas fa-{{ template_data.star_icon}} text-sm"></i>
+                                    </div>
+                                    <span class="text-sm" data-meta="showcase_rating_text">{{ template_data.showcase_rating_text }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-end space-x-3">
+                                    <span class="text-3xl font-bold" data-meta="showcase_price">{{ template_data.showcase_price }}</span>
+                                    <span class="text-lg text-gray-400 line-through" data-meta="showcase_original_price">{{ template_data.showcase_original_price }}</span>
+                                    <span class="bg-amber-400 text-black px-2 py-1 rounded text-xs font-bold" data-meta="showcase_discount_percentage">{{ template_data.showcase_discount_percentage }}</span>
+                                </div>
+                                <p class="text-emerald-400 text-sm mt-1" data-meta="showcase_savings_text">{{ template_data.showcase_savings_text }}</p>
+                            </div>
+                            
+                            <div class="space-y-3 mb-6 flex-grow">
+                                <div class="flex items-center text-base">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-400 mr-3"></i>
+                                    <span data-meta="showcase_feature_1">{{ template_data.showcase_feature_1 }}</span>
+                                </div>
+                                <div class="flex items-center text-base">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-400 mr-3"></i>
+                                    <span data-meta="showcase_feature_2">{{ template_data.showcase_feature_2 }}</span>
+                                </div>
+                                <div class="flex items-center text-base">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-400 mr-3"></i>
+                                    <span data-meta="showcase_feature_3">{{ template_data.showcase_feature_3 }}</span>
+                                </div>
+                                <div class="flex items-center text-base">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-400 mr-3"></i>
+                                    <span data-meta="showcase_feature_4">{{ template_data.showcase_feature_4 }}</span>
+                                </div>
+                                <div class="flex items-center text-base">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-400 mr-3"></i>
+                                    <span data-meta="showcase_feature_5">{{ template_data.showcase_feature_5 }}</span>
+                                </div>
+                            </div>
+                            
+                            <a href="{{ template_data.showcase_cta_link }}" class="bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-3 rounded text-center transition" data-meta="showcase_cta_link showcase_cta_text">
+                                {{ template_data.showcase_cta_text }}
+                            </a>
+                            
+                            <div class="mt-4 text-center text-xs text-gray-400">
+                                <i class="fas fa-{{ template_data.lock_icon}} mr-1"></i>
+                                <span data-meta="showcase_security_text">{{ template_data.showcase_security_text }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                    <div class="bg-white rounded-lg p-4 text-center border">
+                        <i class="fas fa-{{ template_data.trust_badge_1_icon }} text-emerald-600 text-xl mb-2" data-meta="trust_badge_1_icon" data-type="icon"></i>
+                        <p class="text-sm font-semibold" data-meta="trust_badge_1_text">{{ template_data.trust_badge_1_text }}</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 text-center border">
+                        <i class="fas fa-{{ template_data.trust_badge_2_icon }} text-emerald-600 text-xl mb-2" data-meta="trust_badge_2_icon" data-type="icon"></i>
+                        <p class="text-sm font-semibold" data-meta="trust_badge_2_text">{{ template_data.trust_badge_2_text }}</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 text-center border">
+                        <i class="fas fa-{{ template_data.trust_badge_3_icon }} text-emerald-600 text-xl mb-2" data-meta="trust_badge_3_icon" data-type="icon"></i>
+                        <p class="text-sm font-semibold" data-meta="trust_badge_3_text">{{ template_data.trust_badge_3_text }}</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 text-center border">
+                        <i class="fas fa-{{ template_data.trust_badge_4_icon }} text-emerald-600 text-xl mb-2" data-meta="trust_badge_4_icon" data-type="icon"></i>
+                        <p class="text-sm font-semibold" data-meta="trust_badge_4_text">{{ template_data.trust_badge_4_text }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="how-it-works" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="mono-text text-sm text-gray-500" data-meta="how_it_works_label">{{ template_data.how_it_works_label }}</span>
+                    <h2 class="text-4xl font-bold text-gray-900 mt-2 mb-4" data-meta="how_it_works_headline">
+                        {{ template_data.how_it_works_headline }}
+                    </h2>
+                    <p class="text-xl text-gray-600" data-meta="how_it_works_subheadline">
+                        {{ template_data.how_it_works_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center mb-16">
+                    <div class="order-2 md:order-1">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xl">1</div>
+                            <div class="h-px bg-emerald-200 w-16 ml-4"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3" data-meta="step_1_title">{{ template_data.step_1_title }}</h3>
+                        <p class="text-gray-600 mb-4" data-meta="step_1_description">
+                            {{ template_data.step_1_description }}
+                        </p>
+                        <div class="bg-gray-50 border-l-4 border-emerald-500 p-4 rounded">
+                            <p class="text-sm font-semibold text-gray-700" data-meta="step_1_highlight">
+                                {{ template_data.step_1_highlight }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <img src="{{ template_data.step_1_image }}" 
+                             alt="Create how-to image: Finger pressing record button on device with visual feedback showing instant activation. Text Overlay: 'One Touch Start'. Visual Style: Action photography. Color Psychology: Action green, ready state. CTA: Press and record instantly." 
+                             class="w-full rounded-xl shadow-lg" data-meta="step_1_image" data-type="image">
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center mb-16">
+                    <div class="order-2">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xl">2</div>
+                            <div class="h-px bg-emerald-200 w-16 ml-4"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3" data-meta="step_2_title">{{ template_data.step_2_title }}</h3>
+                        <p class="text-gray-600 mb-4" data-meta="step_2_description">
+                            {{ template_data.step_2_description }}
+                        </p>
+                        <div class="bg-gray-50 border-l-4 border-emerald-500 p-4 rounded">
+                            <p class="text-sm font-semibold text-gray-700" data-meta="step_2_highlight">
+                                {{ template_data.step_2_highlight }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="order-1">
+                        <img src="{{ template_data.step_2_image }}" 
+                             alt="Create AI processing image: Neural network visualization with audio waves transforming into clean speech patterns. Text Overlay: 'AI at Work'. Visual Style: Tech visualization. Color Psychology: Intelligence blues and purples. CTA: Advanced processing happening." 
+                             class="w-full rounded-xl shadow-lg" data-meta="step_2_image" data-type="image">
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center mb-16">
+                    <div class="order-2 md:order-1">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xl">3</div>
+                            <div class="h-px bg-emerald-200 w-16 ml-4"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3" data-meta="step_3_title">{{ template_data.step_3_title }}</h3>
+                        <p class="text-gray-600 mb-4" data-meta="step_3_description">
+                            {{ template_data.step_3_description }}
+                        </p>
+                        <div class="bg-gray-50 border-l-4 border-emerald-500 p-4 rounded">
+                            <p class="text-sm font-semibold text-gray-700" data-meta="step_3_highlight">
+                                {{ template_data.step_3_highlight }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <img src="{{ template_data.step_3_image }}" 
+                             alt="Create real-time transcription image: Screen showing words appearing as spoken with perfect punctuation and speaker labels. Text Overlay: 'Instant Transcription'. Visual Style: Live demonstration. Color Psychology: Active greens, clear whites. CTA: See every word appear." 
+                             class="w-full rounded-xl shadow-lg" data-meta="step_3_image" data-type="image">
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="order-2">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-xl">4</div>
+                            <div class="h-px bg-emerald-200 w-16 ml-4"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3" data-meta="step_4_title">{{ template_data.step_4_title }}</h3>
+                        <p class="text-gray-600 mb-4" data-meta="step_4_description">
+                            {{ template_data.step_4_description }}
+                        </p>
+                        <div class="bg-gray-50 border-l-4 border-emerald-500 p-4 rounded">
+                            <p class="text-sm font-semibold text-gray-700" data-meta="step_4_highlight">
+                                {{ template_data.step_4_highlight }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="order-1">
+                        <img src="{{ template_data.step_4_image }}" 
+                             alt="Create export image: Multiple file formats and cloud sync visualization with instant sharing capabilities. Text Overlay: 'Export Anywhere'. Visual Style: Digital workflow. Color Psychology: Connected blues, organized grays. CTA: Share and sync instantly." 
+                             class="w-full rounded-xl shadow-lg" data-meta="step_4_image" data-type="image">
+                    </div>
+                </div>
+                
+                <div class="text-center mt-16">
+                    <p class="text-xl text-gray-700 mb-6" data-meta="how_it_works_cta_text">{{ template_data.how_it_works_cta_text }}</p>
+                    <a href="{{ template_data.how_it_works_cta_link }}" class="cta-primary px-10 py-4 rounded-full font-bold text-lg inline-flex items-center relative overflow-hidden" data-meta="how_it_works_cta_link how_it_works_cta_button">
+                        {{ template_data.how_it_works_cta_button }}
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+<section id="features" class="py-24 bg-gradient-to-b from-white to-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="mono-text text-gray-500" data-meta="features_section_label">{{ template_data.features_section_label }}</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-6" data-meta="features_headline">
+                    {{ template_data.features_headline }}
+                </h2>
+                <p class="text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto" data-meta="features_subheadline">
+                    {{ template_data.features_subheadline }}
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-12">
+                <div class="grid lg:grid-cols-2">
+                    <div class="bg-gradient-to-br from-emerald-500 to-teal-600 p-2">
+                        <img src="{{ template_data.features_main_image }}" 
+                             alt="Create feature showcase image: Professional using device in modern conference room with multiple speakers visible and AI visualization overlay. Text Overlay: 'Capture Every Voice'. Visual Style: Premium business setting. Color Psychology: Professional trust blues. CTA: Perfect for professionals." 
+                             class="w-full h-full object-cover rounded-xl" data-meta="features_main_image" data-type="image">
+                    </div>
+                    
+                    <div class="p-10 lg:p-12">
+                        <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 rounded-xl mb-6">
+                            <i class="fas fa-{{ template_data.main_feature_icon }} text-2xl text-emerald-600" data-meta="main_feature_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-6" data-meta="main_feature_title">{{ template_data.main_feature_title }}</h3>
+                        <p class="text-lg text-gray-600 mb-8 leading-relaxed" data-meta="main_feature_description">
+                            {{ template_data.main_feature_description }}
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-600 text-sm"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="font-semibold text-gray-900 mb-1" data-meta="main_feature_benefit_1_title">{{ template_data.main_feature_benefit_1_title }}</h4>
+                                    <p class="text-gray-600 text-base" data-meta="main_feature_benefit_1_description">{{ template_data.main_feature_benefit_1_description }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-600 text-sm"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="font-semibold text-gray-900 mb-1" data-meta="main_feature_benefit_2_title">{{ template_data.main_feature_benefit_2_title }}</h4>
+                                    <p class="text-gray-600 text-base" data-meta="main_feature_benefit_2_description">{{ template_data.main_feature_benefit_2_description }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-600 text-sm"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="font-semibold text-gray-900 mb-1" data-meta="main_feature_benefit_3_title">{{ template_data.main_feature_benefit_3_title }}</h4>
+                                    <p class="text-gray-600 text-base" data-meta="main_feature_benefit_3_description">{{ template_data.main_feature_benefit_3_description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-10 text-white">
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div>
+                        <i class="fas fa-{{ template_data.user_type_1_icon }} text-4xl mb-4 text-emerald-100" data-meta="user_type_1_icon" data-type="icon"></i>
+                        <h4 class="text-xl font-bold mb-2" data-meta="user_type_1_title">{{ template_data.user_type_1_title }}</h4>
+                        <p class="text-emerald-100 leading-relaxed" data-meta="user_type_1_description">
+                            {{ template_data.user_type_1_description }}
+                        </p>
+                    </div>
+                    <div>
+                        <i class="fas fa-{{ template_data.user_type_2_icon }} text-4xl mb-4 text-emerald-100" data-meta="user_type_2_icon" data-type="icon"></i>
+                        <h4 class="text-xl font-bold mb-2" data-meta="user_type_2_title">{{ template_data.user_type_2_title }}</h4>
+                        <p class="text-emerald-100 leading-relaxed" data-meta="user_type_2_description">
+                            {{ template_data.user_type_2_description }}
+                        </p>
+                    </div>
+                    <div>
+                        <i class="fas fa-{{ template_data.user_type_3_icon }} text-4xl mb-4 text-emerald-100" data-meta="user_type_3_icon" data-type="icon"></i>
+                        <h4 class="text-xl font-bold mb-2" data-meta="user_type_3_title">{{ template_data.user_type_3_title }}</h4>
+                        <p class="text-emerald-100 leading-relaxed" data-meta="user_type_3_description">
+                            {{ template_data.user_type_3_description }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 bg-white rounded-2xl p-8 shadow-sm">
+                <h3 class="text-2xl font-bold mb-8 text-center" data-meta="complete_features_title">{{ template_data.complete_features_title }}</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_1">{{ template_data.feature_list_1 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_2">{{ template_data.feature_list_2 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_3">{{ template_data.feature_list_3 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_4">{{ template_data.feature_list_4 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_5">{{ template_data.feature_list_5 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_6">{{ template_data.feature_list_6 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_7">{{ template_data.feature_list_7 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_8">{{ template_data.feature_list_8 }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 mr-3 text-lg"></i>
+                        <span class="text-gray-700" data-meta="feature_list_9">{{ template_data.feature_list_9 }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-16">
+                <p class="text-2xl text-gray-700 mb-8" data-meta="features_cta_text">{{ template_data.features_cta_text }}</p>
+                <a href="{{ template_data.features_cta_link }}" class="cta-primary inline-flex items-center px-12 py-5 rounded-full font-bold text-xl relative overflow-hidden" data-meta="features_cta_link features_cta_button">
+                    {{ template_data.features_cta_button }}
+                    <i class="fas fa-arrow-right ml-3"></i>
+                </a>
+                <p class="text-gray-500 mt-4" data-meta="features_cta_subtext">{{ template_data.features_cta_subtext }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .mono-text {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+    }
+    
+    .gradient-text {
+        background: linear-gradient(135deg, #10b981 0%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .cta-primary {
+        background: #10b981;
+        color: white;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cta-primary:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .cta-primary::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.6s;
+    }
+    
+    .cta-primary:hover::after {
+        left: 100%;
+    }
+</style>
+    
+<section class="py-24 bg-gradient-to-br from-gray-900 to-black text-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="mono-text text-emerald-400" data-meta="science_section_label">{{ template_data.science_section_label }}</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-3 mb-6" data-meta="science_headline">
+                    {{ template_data.science_headline }}
+                </h2>
+                <p class="text-2xl text-gray-300 leading-relaxed" data-meta="science_subheadline">
+                    {{ template_data.science_subheadline }}
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-6 mb-16">
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-emerald-400 mb-3" data-meta="science_stat_1_value">{{ template_data.science_stat_1_value }}</div>
+                    <p class="text-lg text-gray-400" data-meta="science_stat_1_label">{{ template_data.science_stat_1_label }}</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-emerald-400 mb-3" data-meta="science_stat_2_value">{{ template_data.science_stat_2_value }}</div>
+                    <p class="text-lg text-gray-400" data-meta="science_stat_2_label">{{ template_data.science_stat_2_label }}</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-emerald-400 mb-3" data-meta="science_stat_3_value">{{ template_data.science_stat_3_value }}</div>
+                    <p class="text-lg text-gray-400" data-meta="science_stat_3_label">{{ template_data.science_stat_3_label }}</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-emerald-400 mb-3" data-meta="science_stat_4_value">{{ template_data.science_stat_4_value }}</div>
+                    <p class="text-lg text-gray-400" data-meta="science_stat_4_label">{{ template_data.science_stat_4_label }}</p>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-16">
+                <div class="bg-gray-800 rounded-xl p-8">
+                    <div class="w-14 h-14 bg-emerald-900 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-{{ template_data.study_1_icon }} text-emerald-400 text-2xl" data-meta="study_1_icon" data-type="icon"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4" data-meta="study_1_title">{{ template_data.study_1_title }}</h3>
+                    <p class="text-base text-gray-300 mb-6 leading-relaxed" data-meta="study_1_quote">
+                        {{ template_data.study_1_quote }}
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-400" data-meta="study_1_date">{{ template_data.study_1_date }}</span>
+                        <a href="{{ template_data.study_1_link }}" class="text-emerald-400 text-sm font-semibold hover:text-emerald-300" data-meta="study_1_link study_1_link_text">
+                            {{ template_data.study_1_link_text }}
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-8">
+                    <div class="w-14 h-14 bg-emerald-900 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-{{ template_data.study_2_icon }} text-emerald-400 text-2xl" data-meta="study_2_icon" data-type="icon"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4" data-meta="study_2_title">{{ template_data.study_2_title }}</h3>
+                    <p class="text-base text-gray-300 mb-6 leading-relaxed" data-meta="study_2_quote">
+                        {{ template_data.study_2_quote }}
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-400" data-meta="study_2_date">{{ template_data.study_2_date }}</span>
+                        <a href="{{ template_data.study_2_link }}" class="text-emerald-400 text-sm font-semibold hover:text-emerald-300" data-meta="study_2_link study_2_link_text">
+                            {{ template_data.study_2_link_text }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl p-10 text-center">
+                <i class="fas fa-quote-left text-emerald-400 text-3xl mb-6"></i>
+                <p class="text-xl text-white mb-6 leading-relaxed italic" data-meta="expert_testimonial_quote">
+                    {{ template_data.expert_testimonial_quote }}
+                </p>
+                <div class="flex items-center justify-center">
+                    <div>
+                        <p class="font-bold text-lg" data-meta="expert_testimonial_name">{{ template_data.expert_testimonial_name }}</p>
+                        <p class="text-sm text-gray-400" data-meta="expert_testimonial_title">{{ template_data.expert_testimonial_title }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <p class="text-base text-gray-400 mb-8" data-meta="certifications_label">{{ template_data.certifications_label }}</p>
+                <div class="flex flex-wrap justify-center items-center gap-8">
+                    <div class="bg-gray-800 px-6 py-3 rounded-lg">
+                        <i class="fas fa-{{ template_data.certification_1_icon }} text-emerald-400 mr-2" data-meta="certification_1_icon" data-type="icon"></i>
+                        <span class="text-sm font-semibold" data-meta="certification_1_text">{{ template_data.certification_1_text }}</span>
+                    </div>
+                    <div class="bg-gray-800 px-6 py-3 rounded-lg">
+                        <i class="fas fa-{{ template_data.certification_2_icon }} text-emerald-400 mr-2" data-meta="certification_2_icon" data-type="icon"></i>
+                        <span class="text-sm font-semibold" data-meta="certification_2_text">{{ template_data.certification_2_text }}</span>
+                    </div>
+                    <div class="bg-gray-800 px-6 py-3 rounded-lg">
+                        <i class="fas fa-{{ template_data.certification_3_icon }} text-emerald-400 mr-2" data-meta="certification_3_icon" data-type="icon"></i>
+                        <span class="text-sm font-semibold" data-meta="certification_3_text">{{ template_data.certification_3_text }}</span>
+                    </div>
+                    <div class="bg-gray-800 px-6 py-3 rounded-lg">
+                        <i class="fas fa-{{ template_data.certification_4_icon }} text-emerald-400 mr-2" data-meta="certification_4_icon" data-type="icon"></i>
+                        <span class="text-sm font-semibold" data-meta="certification_4_text">{{ template_data.certification_4_text }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-16">
+                <p class="text-xl text-gray-300 mb-6" data-meta="science_cta_text">{{ template_data.science_cta_text }}</p>
+                <a href="{{ template_data.science_cta_link }}" class="inline-block bg-emerald-500 hover:bg-emerald-600 text-black px-10 py-4 rounded-full font-bold text-lg transition" data-meta="science_cta_link science_cta_button">
+                    {{ template_data.science_cta_button }}
+                    <i class="fas fa-arrow-right ml-3"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+    
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="mono-text text-gray-500" data-meta="who_uses_label">{{ template_data.who_uses_label }}</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-6" data-meta="who_uses_headline">
+                        {{ template_data.who_uses_headline }}
+                    </h2>
+                    <p class="text-2xl text-gray-600 leading-relaxed" data-meta="who_uses_subheadline">
+                        {{ template_data.who_uses_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="modern-card rounded-xl p-8 text-center">
+                        <div class="text-4xl mb-6 text-gray-700">
+                            <i class="fas fa-{{ template_data.user_group_1_icon }}" data-meta="user_group_1_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="user_group_1_title">{{ template_data.user_group_1_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="user_group_1_description">
+                            {{ template_data.user_group_1_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="modern-card rounded-xl p-8 text-center">
+                        <div class="text-4xl mb-6 text-gray-700">
+                            <i class="fas fa-{{ template_data.user_group_2_icon }}" data-meta="user_group_2_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="user_group_2_title">{{ template_data.user_group_2_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="user_group_2_description">
+                            {{ template_data.user_group_2_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="modern-card rounded-xl p-8 text-center">
+                        <div class="text-4xl mb-6 text-gray-700">
+                            <i class="fas fa-{{ template_data.user_group_3_icon }}" data-meta="user_group_3_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="user_group_3_title">{{ template_data.user_group_3_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="user_group_3_description">
+                            {{ template_data.user_group_3_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="modern-card rounded-xl p-8 text-center">
+                        <div class="text-4xl mb-6 text-gray-700">
+                            <i class="fas fa-{{ template_data.user_group_4_icon }}" data-meta="user_group_4_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="user_group_4_title">{{ template_data.user_group_4_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="user_group_4_description">
+                            {{ template_data.user_group_4_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="modern-card rounded-xl p-8 text-center">
+                        <div class="text-4xl mb-6 text-gray-700">
+                            <i class="fas fa-{{ template_data.user_group_5_icon }}" data-meta="user_group_5_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="user_group_5_title">{{ template_data.user_group_5_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="user_group_5_description">
+                            {{ template_data.user_group_5_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="modern-card rounded-xl p-8 text-center">
+                        <div class="text-4xl mb-6 text-gray-700">
+                            <i class="fas fa-{{ template_data.user_group_6_icon }}" data-meta="user_group_6_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3" data-meta="user_group_6_title">{{ template_data.user_group_6_title }}</h3>
+                        <p class="text-base text-gray-600 leading-relaxed" data-meta="user_group_6_description">
+                            {{ template_data.user_group_6_description }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="mono-text text-sm text-gray-500" data-meta="comparison_section_label">{{ template_data.comparison_section_label }}</span>
+                    <h2 class="text-4xl font-bold text-gray-900 mt-2 mb-4" data-meta="comparison_headline">
+                        {{ template_data.comparison_headline }}
+                    </h2>
+                    <p class="text-xl text-gray-600" data-meta="comparison_subheadline">
+                        {{ template_data.comparison_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-black text-white">
+                                    <th class="px-6 py-4 text-left" data-meta="comparison_features_header">{{ template_data.comparison_features_header }}</th>
+                                    <th class="px-6 py-4 text-center">
+                                        <div class="text-emerald-400 font-bold" data-meta="comparison_our_product">{{ template_data.comparison_our_product }}</div>
+                                        <div class="text-xs text-gray-400" data-meta="comparison_our_subtitle">{{ template_data.comparison_our_subtitle }}</div>
+                                    </th>
+                                    <th class="px-6 py-4 text-center">
+                                        <div data-meta="comparison_traditional">{{ template_data.comparison_traditional }}</div>
+                                        <div class="text-xs text-gray-400" data-meta="comparison_traditional_subtitle">{{ template_data.comparison_traditional_subtitle }}</div>
+                                    </th>
+                                    <th class="px-6 py-4 text-center">
+                                        <div data-meta="comparison_competitors">{{ template_data.comparison_competitors }}</div>
+                                        <div class="text-xs text-gray-400" data-meta="comparison_competitors_subtitle">{{ template_data.comparison_competitors_subtitle }}</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="px-6 py-4 font-medium" data-meta="comparison_row_1_feature">{{ template_data.comparison_row_1_feature }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="text-emerald-600 font-bold" data-meta="comparison_row_1_our">{{ template_data.comparison_row_1_our }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_1_traditional">{{ template_data.comparison_row_1_traditional }}</td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_1_competitors">{{ template_data.comparison_row_1_competitors }}</td>
+                                </tr>
+                                <tr class="border-b bg-gray-50">
+                                    <td class="px-6 py-4 font-medium" data-meta="comparison_row_2_feature">{{ template_data.comparison_row_2_feature }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 text-xl"></i>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <i class="fas fa-{{ template_data.times_circle_icon}} text-gray-300 text-xl"></i>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <i class="fas fa-{{ template_data.times_circle_icon}} text-gray-300 text-xl"></i>
+                                    </td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-6 py-4 font-medium" data-meta="comparison_row_3_feature">{{ template_data.comparison_row_3_feature }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="text-emerald-600 font-bold" data-meta="comparison_row_3_our">{{ template_data.comparison_row_3_our }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_3_traditional">{{ template_data.comparison_row_3_traditional }}</td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_3_competitors">{{ template_data.comparison_row_3_competitors }}</td>
+                                </tr>
+                                <tr class="border-b bg-gray-50">
+                                    <td class="px-6 py-4 font-medium" data-meta="comparison_row_4_feature">{{ template_data.comparison_row_4_feature }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 text-xl"></i>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <i class="fas fa-{{ template_data.times_circle_icon}} text-gray-300 text-xl"></i>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <i class="fas fa-{{ template_data.minus_circle_icon}} text-yellow-400 text-xl"></i>
+                                    </td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-6 py-4 font-medium" data-meta="comparison_row_5_feature">{{ template_data.comparison_row_5_feature }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="text-emerald-600 font-bold" data-meta="comparison_row_5_our">{{ template_data.comparison_row_5_our }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_5_traditional">{{ template_data.comparison_row_5_traditional }}</td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_5_competitors">{{ template_data.comparison_row_5_competitors }}</td>
+                                </tr>
+                                <tr class="border-b bg-gray-50">
+                                    <td class="px-6 py-4 font-medium" data-meta="comparison_row_6_feature">{{ template_data.comparison_row_6_feature }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div>
+                                            <span class="text-emerald-600 font-bold" data-meta="comparison_row_6_our_price">{{ template_data.comparison_row_6_our_price }}</span>
+                                            <span class="text-xs text-gray-400 line-through block" data-meta="comparison_row_6_our_original">{{ template_data.comparison_row_6_our_original }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_6_traditional">{{ template_data.comparison_row_6_traditional }}</td>
+                                    <td class="px-6 py-4 text-center text-gray-400" data-meta="comparison_row_6_competitors">{{ template_data.comparison_row_6_competitors }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <p class="text-lg text-gray-700 font-semibold" data-meta="comparison_conclusion_title">
+                        {{ template_data.comparison_conclusion_title }}
+                    </p>
+                    <p class="text-gray-600 mt-2" data-meta="comparison_conclusion_subtitle">
+                        {{ template_data.comparison_conclusion_subtitle }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="mono-text text-sm text-gray-500" data-meta="quality_section_label">{{ template_data.quality_section_label }}</span>
+                    <h2 class="text-4xl font-bold text-gray-900 mt-2 mb-4" data-meta="quality_headline">
+                        {{ template_data.quality_headline }}
+                    </h2>
+                    <p class="text-xl text-gray-600" data-meta="quality_subheadline">
+                        {{ template_data.quality_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-{{ template_data.quality_1_icon }} text-3xl text-emerald-600" data-meta="quality_1_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold mb-2" data-meta="quality_1_title">{{ template_data.quality_1_title }}</h3>
+                        <p class="text-sm text-gray-600" data-meta="quality_1_description">
+                            {{ template_data.quality_1_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-{{ template_data.quality_2_icon }} text-3xl text-emerald-600" data-meta="quality_2_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold mb-2" data-meta="quality_2_title">{{ template_data.quality_2_title }}</h3>
+                        <p class="text-sm text-gray-600" data-meta="quality_2_description">
+                            {{ template_data.quality_2_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-{{ template_data.quality_3_icon }} text-3xl text-emerald-600" data-meta="quality_3_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold mb-2" data-meta="quality_3_title">{{ template_data.quality_3_title }}</h3>
+                        <p class="text-sm text-gray-600" data-meta="quality_3_description">
+                            {{ template_data.quality_3_description }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-{{ template_data.quality_4_icon }} text-3xl text-emerald-600" data-meta="quality_4_icon" data-type="icon"></i>
+                        </div>
+                        <h3 class="font-bold mb-2" data-meta="quality_4_title">{{ template_data.quality_4_title }}</h3>
+                        <p class="text-sm text-gray-600" data-meta="quality_4_description">
+                            {{ template_data.quality_4_description }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-12 pt-12 border-t">
+                    <p class="text-center text-sm text-gray-500 mb-6" data-meta="quality_certifications_label">{{ template_data.quality_certifications_label }}</p>
+                    <div class="flex flex-wrap justify-center items-center gap-8">
+                        <div class="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">
+                            <span class="text-xs font-bold text-gray-600" data-meta="quality_cert_1">{{ template_data.quality_cert_1 }}</span>
+                        </div>
+                        <div class="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">
+                            <span class="text-xs font-bold text-gray-600" data-meta="quality_cert_2">{{ template_data.quality_cert_2 }}</span>
+                        </div>
+                        <div class="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">
+                            <span class="text-xs font-bold text-gray-600" data-meta="quality_cert_3">{{ template_data.quality_cert_3 }}</span>
+                        </div>
+                        <div class="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">
+                            <span class="text-xs font-bold text-gray-600" data-meta="quality_cert_4">{{ template_data.quality_cert_4 }}</span>
+                        </div>
+                        <div class="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">
+                            <span class="text-xs font-bold text-gray-600" data-meta="quality_cert_5">{{ template_data.quality_cert_5 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="reviews" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="mono-text text-sm text-gray-500" data-meta="reviews_section_label">{{ template_data.reviews_section_label }}</span>
+                    <h2 class="text-4xl font-bold text-gray-900 mt-2 mb-4" data-meta="reviews_headline">
+                        {{ template_data.reviews_headline }}
+                    </h2>
+                    <p class="text-xl text-gray-600" data-meta="reviews_subheadline">
+                        {{ template_data.reviews_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="mb-12">
+                    <h3 class="text-2xl font-bold text-center mb-8" data-meta="reviews_photos_title">{{ template_data.reviews_photos_title }}</h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="relative overflow-hidden rounded-xl">
+                            <img src="{{ template_data.review_photo_1 }}" 
+                                 alt="Customer testimonial: Executive using VoiceAI Pro in boardroom" 
+                                 class="w-full aspect-square object-cover hover:scale-105 transition duration-300" data-meta="review_photo_1" data-type="image">
+                        </div>
+                        
+                        <div class="relative overflow-hidden rounded-xl">
+                            <img src="{{ template_data.review_photo_2 }}" 
+                                 alt="Customer testimonial: Professional recording important meeting" 
+                                 class="w-full aspect-square object-cover hover:scale-105 transition duration-300" data-meta="review_photo_2" data-type="image">
+                        </div>
+                        
+                        <div class="relative overflow-hidden rounded-xl">
+                            <img src="{{ template_data.review_photo_3 }}" 
+                                 alt="Customer testimonial: Business owner using VoiceAI device" 
+                                 class="w-full aspect-square object-cover hover:scale-105 transition duration-300" data-meta="review_photo_3" data-type="image">
+                        </div>
+                        
+                        <div class="relative overflow-hidden rounded-xl">
+                            <img src="{{ template_data.review_photo_4 }}" 
+                                 alt="Customer testimonial: Doctor using VoiceAI for patient notes" 
+                                 class="w-full aspect-square object-cover hover:scale-105 transition duration-300" data-meta="review_photo_4" data-type="image">
+                        </div>
+                        
+                        <div class="relative overflow-hidden rounded-xl">
+                            <img src="{{ template_data.review_photo_5 }}" 
+                                 alt="Customer testimonial: Journalist conducting interview" 
+                                 class="w-full aspect-square object-cover hover:scale-105 transition duration-300" data-meta="review_photo_5" data-type="image">
+                        </div>
+                        
+                        <div class="relative overflow-hidden rounded-xl">
+                            <img src="{{ template_data.review_photo_6 }}" 
+                                 alt="Customer testimonial: Student recording lecture" 
+                                 class="w-full aspect-square object-cover hover:scale-105 transition duration-300" data-meta="review_photo_6" data-type="image">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-12">
+                    <div class="bg-white rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-amber-400">
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                            </div>
+                            <span class="ml-2 text-sm text-gray-500" data-meta="review_1_verified">{{ template_data.review_1_verified }}</span>
+                        </div>
+                        <h4 class="font-bold mb-2" data-meta="review_1_title">{{ template_data.review_1_title }}</h4>
+                        <p class="text-gray-600 mb-4" data-meta="review_1_text">
+                            {{ template_data.review_1_text }}
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.user_icon}} text-gray-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-semibold text-sm" data-meta="review_1_name">{{ template_data.review_1_name }}</p>
+                                <p class="text-xs text-gray-500" data-meta="review_1_role">{{ template_data.review_1_role }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-amber-400">
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                            </div>
+                            <span class="ml-2 text-sm text-gray-500" data-meta="review_2_verified">{{ template_data.review_2_verified }}</span>
+                        </div>
+                        <h4 class="font-bold mb-2" data-meta="review_2_title">{{ template_data.review_2_title }}</h4>
+                        <p class="text-gray-600 mb-4" data-meta="review_2_text">
+                            {{ template_data.review_2_text }}
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.user_icon}} text-gray-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-semibold text-sm" data-meta="review_2_name">{{ template_data.review_2_name }}</p>
+                                <p class="text-xs text-gray-500" data-meta="review_2_role">{{ template_data.review_2_role }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-amber-400">
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                            </div>
+                            <span class="ml-2 text-sm text-gray-500" data-meta="review_3_verified">{{ template_data.review_3_verified }}</span>
+                        </div>
+                        <h4 class="font-bold mb-2" data-meta="review_3_title">{{ template_data.review_3_title }}</h4>
+                        <p class="text-gray-600 mb-4" data-meta="review_3_text">
+                            {{ template_data.review_3_text }}
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.user_icon}} text-gray-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-semibold text-sm" data-meta="review_3_name">{{ template_data.review_3_name }}</p>
+                                <p class="text-xs text-gray-500" data-meta="review_3_role">{{ template_data.review_3_role }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-amber-400">
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                                <i class="fas fa-{{ template_data.star_icon}}"></i>
+                            </div>
+                            <span class="ml-2 text-sm text-gray-500" data-meta="review_4_verified">{{ template_data.review_4_verified }}</span>
+                        </div>
+                        <h4 class="font-bold mb-2" data-meta="review_4_title">{{ template_data.review_4_title }}</h4>
+                        <p class="text-gray-600 mb-4" data-meta="review_4_text">
+                            {{ template_data.review_4_text }}
+                        </p>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.user_icon}} text-gray-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="font-semibold text-sm" data-meta="review_4_name">{{ template_data.review_4_name }}</p>
+                                <p class="text-xs text-gray-500" data-meta="review_4_role">{{ template_data.review_4_role }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-black text-white rounded-2xl p-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                        <div>
+                            <div class="text-3xl font-bold text-emerald-400" data-meta="reviews_stat_1_value">{{ template_data.reviews_stat_1_value }}</div>
+                            <p class="text-sm text-gray-400 mt-1" data-meta="reviews_stat_1_label">{{ template_data.reviews_stat_1_label }}</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-emerald-400" data-meta="reviews_stat_2_value">{{ template_data.reviews_stat_2_value }}</div>
+                            <p class="text-sm text-gray-400 mt-1" data-meta="reviews_stat_2_label">{{ template_data.reviews_stat_2_label }}</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-emerald-400" data-meta="reviews_stat_3_value">{{ template_data.reviews_stat_3_value }}</div>
+                            <p class="text-sm text-gray-400 mt-1" data-meta="reviews_stat_3_label">{{ template_data.reviews_stat_3_label }}</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-emerald-400" data-meta="reviews_stat_4_value">{{ template_data.reviews_stat_4_value }}</div>
+                            <p class="text-sm text-gray-400 mt-1" data-meta="reviews_stat_4_label">{{ template_data.reviews_stat_4_label }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="offer" class="py-24 bg-gradient-to-b from-white to-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <div class="inline-flex items-center bg-red-100 text-red-700 px-6 py-3 rounded-full mb-6">
+                        <i class="fas fa-{{ template_data.fire_icon}} text-xl mr-3 animate-pulse"></i>
+                        <span class="font-bold text-base" data-meta="offer_urgency_text">{{ template_data.offer_urgency_text }}</span>
+                        <i class="fas fa-{{ template_data.fire_icon}} text-xl ml-3 animate-pulse"></i>
+                    </div>
+                    
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6" data-meta="offer_headline">
+                        {{ template_data.offer_headline }}
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto" data-meta="offer_subheadline">
+                        {{ template_data.offer_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="grid lg:grid-cols-3 gap-6 mb-12">
+                    
+                    <div class="package-card root-product-render bg-white border-2 border-gray-200 rounded-2xl p-8 relative">
+                        <div class="text-center">
+                            <div class="mb-6">
+                                <img src="{{ template_data.package_1_image }}" 
+                                     alt="Create package image: Single device elegantly presented on minimalist background. Text Overlay: 'Start Recording'. Visual Style: Product photography. Color Psychology: Clean professional aesthetics. CTA: Perfect for individuals." 
+                                     class="w-32 h-32 object-cover rounded-2xl mx-auto" data-meta="package_1_image" data-type="image">
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold mb-2" data-meta="package_1_title">{{ template_data.package_1_title }}</h3>
+                            <p class="text-gray-600 mb-6" data-meta="package_1_subtitle">{{ template_data.package_1_subtitle }}</p>
+
+                            <div class="variant-select-wrapper"></div>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center justify-center space-x-3">
+                                    <span class="text-4xl font-bold price-discount" data-meta="package_1_price">{{ template_data.package_1_price }}</span>
+                                    <span class="text-xl text-gray-400 line-through price-original" data-meta="package_1_original_price">{{ template_data.package_1_original_price }}</span>
+                                </div>
+                                <div class="price-discount-text-wp">
+                                    <p class="text-emerald-600 font-semibold text-lg mt-2 price-discount-text" data-meta="package_1_savings">{{ template_data.package_1_savings }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 mb-8 text-left">
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_1_feature_1">{{ template_data.package_1_feature_1 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_1_feature_2">{{ template_data.package_1_feature_2 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.shipping_fast}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_1_feature_3">{{ template_data.package_1_feature_3 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.crown}} text-amber-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_1_feature_4">{{ template_data.package_1_feature_4 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.gift}} text-amber-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_1_feature_5">{{ template_data.package_1_feature_5 }}</span>
+                                </div>
+                            </div>
+                            
+                            <button class="add-to-cart-button w-full bg-gray-100 hover:bg-gray-200 text-gray-900 py-4 rounded-xl font-bold text-lg transition" data-meta="package_1_button">
+                                {{ template_data.package_1_button }}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card root-product-render bg-gradient-to-b from-emerald-50 to-white border-2 border-emerald-500 rounded-2xl p-8 relative best-value-glow transform lg:scale-105">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div class="popular-badge text-white px-6 py-2 rounded-full text-sm font-bold" data-meta="package_2_badge">
+                                {{ template_data.package_2_badge }}
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="mb-6">
+                                <img src="{{ template_data.package_2_image }}" 
+                                     alt="Create package image: Two devices arranged symmetrically showing double value. Text Overlay: 'Most Popular Choice'. Visual Style: Value proposition photography. Color Psychology: Success greens, trust blues. CTA: Best value for teams." 
+                                     class="w-32 h-32 object-cover rounded-2xl mx-auto" data-meta="package_2_image" data-type="image">
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold mb-2" data-meta="package_2_title">{{ template_data.package_2_title }}</h3>
+                            <p class="text-gray-600 mb-6" data-meta="package_2_subtitle">{{ template_data.package_2_subtitle }}</p>
+
+                            <div class="variant-select-wrapper"></div>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center justify-center space-x-3">
+                                    <span class="text-4xl font-bold text-emerald-600 price-discount" data-meta="package_2_price">{{ template_data.package_2_price }}</span>
+                                    <span class="text-xl text-gray-400 line-through price-original" data-meta="package_2_original_price">{{ template_data.package_2_original_price }}</span>
+                                </div>
+                                <div class="price-discount-text-wp">
+                                    <div class="price-discount-text inline-block savings-badge text-white px-4 py-1 rounded-full text-sm font-bold mt-2" data-meta="package_2_savings">
+                                        {{ template_data.package_2_savings }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 mb-8 text-left">
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_2_feature_1">{{ template_data.package_2_feature_1 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_2_feature_2">{{ template_data.package_2_feature_2 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.shipping_fast}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_2_feature_3">{{ template_data.package_2_feature_3 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.crown}} text-amber-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_2_feature_4">{{ template_data.package_2_feature_4 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.gift}} text-amber-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_2_feature_5">{{ template_data.package_2_feature_5 }}</span>
+                                </div>
+                            </div>
+                            
+                            <button class="add-to-cart-button w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold text-lg transition transform hover:scale-105 shadow-lg" data-meta="package_2_button">
+                                {{ template_data.package_2_button }}
+                            </button>
+                            
+                            <p class="text-sm text-red-600 font-semibold mt-3">
+                                <i class="fas fa-{{ template_data.fire_icon}}"></i> <span data-meta="package_2_popularity">{{ template_data.package_2_popularity }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card root-product-render bg-white border-2 border-gray-200 rounded-2xl p-8 relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div class="bg-amber-500 text-white px-6 py-2 rounded-full text-sm font-bold" data-meta="package_3_badge">
+                                {{ template_data.package_3_badge }}
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="mb-6">
+                                <img src="{{ template_data.package_3_image }}" 
+                                     alt="Create package image: Three devices displayed in premium arrangement showing maximum value. Text Overlay: 'Ultimate Package'. Visual Style: Luxury product photography. Color Psychology: Premium golds, sophisticated blacks. CTA: Maximum savings for teams." 
+                                     class="w-32 h-32 object-cover rounded-2xl mx-auto" data-meta="package_3_image" data-type="image">
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold mb-2" data-meta="package_3_title">{{ template_data.package_3_title }}</h3>
+                            <p class="text-gray-600 mb-6" data-meta="package_3_subtitle">{{ template_data.package_3_subtitle }}</p>
+
+                            <div class="variant-select-wrapper"></div>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center justify-center space-x-3">
+                                    <span class="text-4xl font-bold price-discount" data-meta="package_3_price">{{ template_data.package_3_price }}</span>
+                                    <span class="text-xl text-gray-400 line-through price-original" data-meta="package_3_original_price">{{ template_data.package_3_original_price }}</span>
+                                </div>
+                                <div class="price-discount-text-wp">
+                                    <p class="text-emerald-600 font-semibold text-lg mt-2 price-discount-text" data-meta="package_3_savings">{{ template_data.package_3_savings }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 mb-8 text-left">
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_3_feature_1">{{ template_data.package_3_feature_1 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.check_icon}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_3_feature_2">{{ template_data.package_3_feature_2 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.shipping_fast}} text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_3_feature_3">{{ template_data.package_3_feature_3 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.crown}} text-amber-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_3_feature_4">{{ template_data.package_3_feature_4 }}</span>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-{{ template_data.gift}} text-amber-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700 text-base" data-meta="package_3_feature_5">{{ template_data.package_3_feature_5 }}</span>
+                                </div>
+                            </div>
+                            
+                            <button class="add-to-cart-button w-full bg-gray-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold text-lg transition" data-meta="package_3_button">
+                                {{ template_data.package_3_button }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white rounded-lg p-4 text-center">
+                    <i class="fas fa-{{ template_data.offer_trust_1_icon }} text-2xl text-emerald-500 mb-2" data-meta="offer_trust_1_icon" data-type="icon"></i>
+                    <p class="text-sm font-semibold" data-meta="offer_trust_1_title">{{ template_data.offer_trust_1_title }}</p>
+                    <p class="text-xs text-gray-500" data-meta="offer_trust_1_subtitle">{{ template_data.offer_trust_1_subtitle }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 text-center">
+                    <i class="fas fa-{{ template_data.offer_trust_2_icon }} text-2xl text-emerald-500 mb-2" data-meta="offer_trust_2_icon" data-type="icon"></i>
+                    <p class="text-sm font-semibold" data-meta="offer_trust_2_title">{{ template_data.offer_trust_2_title }}</p>
+                    <p class="text-xs text-gray-500" data-meta="offer_trust_2_subtitle">{{ template_data.offer_trust_2_subtitle }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 text-center">
+                    <i class="fas fa-{{ template_data.offer_trust_3_icon }} text-2xl text-emerald-500 mb-2" data-meta="offer_trust_3_icon" data-type="icon"></i>
+                    <p class="text-sm font-semibold" data-meta="offer_trust_3_title">{{ template_data.offer_trust_3_title }}</p>
+                    <p class="text-xs text-gray-500" data-meta="offer_trust_3_subtitle">{{ template_data.offer_trust_3_subtitle }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-4 text-center">
+                    <i class="fas fa-{{ template_data.offer_trust_4_icon }} text-2xl text-emerald-500 mb-2" data-meta="offer_trust_4_icon" data-type="icon"></i>
+                    <p class="text-sm font-semibold" data-meta="offer_trust_4_title">{{ template_data.offer_trust_4_title }}</p>
+                    <p class="text-xs text-gray-500" data-meta="offer_trust_4_subtitle">{{ template_data.offer_trust_4_subtitle }}</p>
+                </div>
+            </div>
+                
+                <div class="mt-8 text-center">
+                    <p class="text-gray-600 mb-4" data-meta="payment_options_text">{{ template_data.payment_options_text }}</p>
+                    <div class="flex justify-center items-center space-x-4">
+                        <i class="fab fa-cc-visa text-3xl text-gray-400"></i>
+                        <i class="fab fa-cc-mastercard text-3xl text-gray-400"></i>
+                        <i class="fab fa-cc-amex text-3xl text-gray-400"></i>
+                        <i class="fab fa-cc-paypal text-3xl text-gray-400"></i>
+                        <i class="fab fa-apple-pay text-3xl text-gray-400"></i>
+                        <i class="fab fa-google-pay text-3xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-20 bg-gradient-to-r from-emerald-50 to-green-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 text-center">
+                    <div class="inline-block mb-8">
+                        <div class="relative">
+                            <div class="w-32 h-32 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                                <i class="fas fa-{{ template_data.guarantee_icon }} text-white text-5xl" data-meta="guarantee_icon" data-type="icon"></i>
+                            </div>
+                            <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-bold whitespace-nowrap" data-meta="guarantee_badge">
+                                {{ template_data.guarantee_badge }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6" data-meta="guarantee_headline">
+                        {{ template_data.guarantee_headline }}
+                    </h2>
+                    
+                    <p class="text-xl text-gray-700 mb-8 leading-relaxed max-w-3xl mx-auto" data-meta="guarantee_description">
+                        {{ template_data.guarantee_description }}
+                    </p>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 mb-10">
+                        <div class="bg-emerald-50 rounded-xl p-6">
+                            <i class="fas fa-{{ template_data.guarantee_feature_1_icon }} text-emerald-600 text-3xl mb-4" data-meta="guarantee_feature_1_icon" data-type="icon"></i>
+                            <h3 class="font-bold text-lg mb-2" data-meta="guarantee_feature_1_title">{{ template_data.guarantee_feature_1_title }}</h3>
+                            <p class="text-gray-600" data-meta="guarantee_feature_1_text">{{ template_data.guarantee_feature_1_text }}</p>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-6">
+                            <i class="fas fa-{{ template_data.guarantee_feature_2_icon }} text-emerald-600 text-3xl mb-4" data-meta="guarantee_feature_2_icon" data-type="icon"></i>
+                            <h3 class="font-bold text-lg mb-2" data-meta="guarantee_feature_2_title">{{ template_data.guarantee_feature_2_title }}</h3>
+                            <p class="text-gray-600" data-meta="guarantee_feature_2_text">{{ template_data.guarantee_feature_2_text }}</p>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-6">
+                            <i class="fas fa-{{ template_data.guarantee_feature_3_icon }} text-emerald-600 text-3xl mb-4" data-meta="guarantee_feature_3_icon" data-type="icon"></i>
+                            <h3 class="font-bold text-lg mb-2" data-meta="guarantee_feature_3_title">{{ template_data.guarantee_feature_3_title }}</h3>
+                            <p class="text-gray-600" data-meta="guarantee_feature_3_text">{{ template_data.guarantee_feature_3_text }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-2xl p-6 mb-8">
+                        <p class="text-lg text-gray-700 italic" data-meta="guarantee_quote">
+                            {{ template_data.guarantee_quote }}
+                        </p>
+                        <p class="text-gray-600 mt-3" data-meta="guarantee_quote_author">
+                            <strong>{{ template_data.guarantee_quote_author }}</strong>
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <a href="{{ template_data.guarantee_cta_link }}" class="inline-block bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-10 py-4 rounded-full font-bold text-xl transition transform hover:scale-105 shadow-lg" data-meta="guarantee_cta_link guarantee_cta_text">
+                            {{ template_data.guarantee_cta_text }}
+                            <i class="fas fa-arrow-right ml-3"></i>
+                        </a>
+                        <p class="text-sm text-gray-500 mt-4">
+                            <i class="fas fa-{{ template_data.lock_icon}} mr-2"></i>
+                            <span data-meta="guarantee_security_text">{{ template_data.guarantee_security_text }}</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-12 text-center">
+                    <p class="text-gray-600 mb-6" data-meta="guarantee_trust_text">{{ template_data.guarantee_trust_text }}</p>
+                    <div class="flex flex-wrap justify-center items-center gap-8">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-emerald-600" data-meta="guarantee_stat_1_value">{{ template_data.guarantee_stat_1_value }}</div>
+                            <p class="text-gray-600" data-meta="guarantee_stat_1_label">{{ template_data.guarantee_stat_1_label }}</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-emerald-600" data-meta="guarantee_stat_2_value">{{ template_data.guarantee_stat_2_value }}</div>
+                            <p class="text-gray-600" data-meta="guarantee_stat_2_label">{{ template_data.guarantee_stat_2_label }}</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-emerald-600" data-meta="guarantee_stat_3_value">{{ template_data.guarantee_stat_3_value }}</div>
+                            <p class="text-gray-600" data-meta="guarantee_stat_3_label">{{ template_data.guarantee_stat_3_label }}</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-emerald-600" data-meta="guarantee_stat_4_value">{{ template_data.guarantee_stat_4_value }}</div>
+                            <p class="text-gray-600" data-meta="guarantee_stat_4_label">{{ template_data.guarantee_stat_4_label }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+        
+        .popular-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .package-card {
+            transition: all 0.3s ease;
+        }
+        
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .best-value-glow {
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
+        }
+        
+        .savings-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+    </style>
+    
+    <script>
+        document.querySelectorAll('.package-card button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.package-card').forEach(card => {
+                    card.classList.remove('ring-4', 'ring-emerald-500');
+                });
+                
+                this.closest('.package-card').classList.add('ring-4', 'ring-emerald-500');
+                
+                if (document.querySelector('#checkout')) {
+                    document.querySelector('#checkout').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+
+    
+    <section class="py-24 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="mono-text text-gray-500" data-meta="faq_section_label">{{ template_data.faq_section_label }}</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mt-3 mb-6" data-meta="faq_headline">
+                        {{ template_data.faq_headline }}
+                    </h2>
+                    <p class="text-2xl text-gray-600 leading-relaxed" data-meta="faq_subheadline">
+                        {{ template_data.faq_subheadline }}
+                    </p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <button class="w-full px-8 py-6 text-left flex items-center justify-between faq-toggle">
+                            <span class="font-semibold text-lg" data-meta="faq_1_question">{{ template_data.faq_1_question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform text-xl"></i>
+                        </button>
+                        <div class="faq-content hidden px-8 pb-6">
+                            <p class="text-gray-600 text-base leading-relaxed" data-meta="faq_1_answer">
+                                {{ template_data.faq_1_answer }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <button class="w-full px-8 py-6 text-left flex items-center justify-between faq-toggle">
+                            <span class="font-semibold text-lg" data-meta="faq_2_question">{{ template_data.faq_2_question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform text-xl"></i>
+                        </button>
+                        <div class="faq-content hidden px-8 pb-6">
+                            <p class="text-gray-600 text-base leading-relaxed" data-meta="faq_2_answer">
+                                {{ template_data.faq_2_answer }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <button class="w-full px-8 py-6 text-left flex items-center justify-between faq-toggle">
+                            <span class="font-semibold text-lg" data-meta="faq_3_question">{{ template_data.faq_3_question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform text-xl"></i>
+                        </button>
+                        <div class="faq-content hidden px-8 pb-6">
+                            <p class="text-gray-600 text-base leading-relaxed" data-meta="faq_3_answer">
+                                {{ template_data.faq_3_answer }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <button class="w-full px-8 py-6 text-left flex items-center justify-between faq-toggle">
+                            <span class="font-semibold text-lg" data-meta="faq_4_question">{{ template_data.faq_4_question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform text-xl"></i>
+                        </button>
+                        <div class="faq-content hidden px-8 pb-6">
+                            <p class="text-gray-600 text-base leading-relaxed" data-meta="faq_4_answer">
+                                {{ template_data.faq_4_answer }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <button class="w-full px-8 py-6 text-left flex items-center justify-between faq-toggle">
+                            <span class="font-semibold text-lg" data-meta="faq_5_question">{{ template_data.faq_5_question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform text-xl"></i>
+                        </button>
+                        <div class="faq-content hidden px-8 pb-6">
+                            <p class="text-gray-600 text-base leading-relaxed" data-meta="faq_5_answer">
+                                {{ template_data.faq_5_answer }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <button class="w-full px-8 py-6 text-left flex items-center justify-between faq-toggle">
+                            <span class="font-semibold text-lg" data-meta="faq_6_question">{{ template_data.faq_6_question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform text-xl"></i>
+                        </button>
+                        <div class="faq-content hidden px-8 pb-6">
+                            <p class="text-gray-600 text-base leading-relaxed" data-meta="faq_6_answer">
+                                {{ template_data.faq_6_answer }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <button class="w-full px-8 py-6 text-left flex items-center justify-between faq-toggle">
+                            <span class="font-semibold text-lg" data-meta="faq_7_question">{{ template_data.faq_7_question }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform text-xl"></i>
+                        </button>
+                        <div class="faq-content hidden px-8 pb-6">
+                            <p class="text-gray-600 text-base leading-relaxed" data-meta="faq_7_answer">
+                                {{ template_data.faq_7_answer }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-24 bg-gradient-to-br from-gray-900 to-black text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-block bg-red-600 text-white px-8 py-3 rounded-full mb-10">
+                    <i class="fas fa-{{ template_data.clock_icon}} mr-3"></i>
+                    <span class="font-bold text-lg" data-meta="final_cta_urgency">{{ template_data.final_cta_urgency }}</span>
+                </div>
+                
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-8" data-meta="final_cta_headline">
+                    {{ template_data.final_cta_headline }}
+                </h2>
+                
+                <p class="text-2xl text-gray-300 mb-12 leading-relaxed" data-meta="final_cta_subheadline">
+                    {{ template_data.final_cta_subheadline }}
+                </p>
+                
+                <div class="grid md:grid-cols-3 gap-8 mb-12">
+                    <div>
+                        <i class="fas fa-{{ template_data.final_benefit_1_icon }} text-emerald-400 text-4xl mb-4" data-meta="final_benefit_1_icon" data-type="icon"></i>
+                        <h3 class="font-semibold text-xl mb-3" data-meta="final_benefit_1_title">{{ template_data.final_benefit_1_title }}</h3>
+                        <p class="text-base text-gray-400" data-meta="final_benefit_1_text">{{ template_data.final_benefit_1_text }}</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-{{ template_data.final_benefit_2_icon }} text-emerald-400 text-4xl mb-4" data-meta="final_benefit_2_icon" data-type="icon"></i>
+                        <h3 class="font-semibold text-xl mb-3" data-meta="final_benefit_2_title">{{ template_data.final_benefit_2_title }}</h3>
+                        <p class="text-base text-gray-400" data-meta="final_benefit_2_text">{{ template_data.final_benefit_2_text }}</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-{{ template_data.final_benefit_3_icon }} text-emerald-400 text-4xl mb-4" data-meta="final_benefit_3_icon" data-type="icon"></i>
+                        <h3 class="font-semibold text-xl mb-3" data-meta="final_benefit_3_title">{{ template_data.final_benefit_3_title }}</h3>
+                        <p class="text-base text-gray-400" data-meta="final_benefit_3_text">{{ template_data.final_benefit_3_text }}</p>
+                    </div>
+                </div>
+                
+                <a href="{{ template_data.final_cta_button_link }}" class="inline-block bg-emerald-500 hover:bg-emerald-600 text-black px-14 py-6 rounded-full font-bold text-2xl transition transform hover:scale-105" data-meta="final_cta_button_link final_cta_button_text">
+                    {{ template_data.final_cta_button_text }}
+                    <i class="fas fa-arrow-right ml-3"></i>
+                </a>
+                
+                <p class="text-base text-gray-400 mt-8" data-meta="final_cta_guarantee">
+                    <i class="fas fa-{{ template_data.lock_icon}} mr-2"></i>
+                    {{ template_data.final_cta_guarantee }}
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-black text-gray-400 py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-4 gap-8 mb-8">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="w-8 h-8 bg-white rounded flex items-center justify-center">
+                                <i class="fas fa-{{ template_data.footer_logo_icon }} text-black text-xl" data-meta="footer_logo_icon" data-type="icon"></i>
+                            </div>
+                            <span class="text-white font-bold" data-meta="footer_brand_name">{{ template_data.footer_brand_name }}</span>
+                        </div>
+                        <p class="text-sm" data-meta="footer_brand_description">
+                            {{ template_data.footer_brand_description }}
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-white font-semibold mb-4" data-meta="footer_column_1_title">{{ template_data.footer_column_1_title }}</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="{{ template_data.footer_link_1_1_href }}" class="hover:text-white transition" data-meta="footer_link_1_1_href footer_link_1_1_text">{{ template_data.footer_link_1_1_text }}</a></li>
+                            <li><a href="{{ template_data.footer_link_1_2_href }}" class="hover:text-white transition" data-meta="footer_link_1_2_href footer_link_1_2_text">{{ template_data.footer_link_1_2_text }}</a></li>
+                            <li><a href="{{ template_data.footer_link_1_3_href }}" class="hover:text-white transition" data-meta="footer_link_1_3_href footer_link_1_3_text">{{ template_data.footer_link_1_3_text }}</a></li>
+                            <li><a href="{{ template_data.footer_link_1_4_href }}" class="hover:text-white transition" data-meta="footer_link_1_4_href footer_link_1_4_text">{{ template_data.footer_link_1_4_text }}</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-white font-semibold mb-4" data-meta="footer_column_2_title">{{ template_data.footer_column_2_title }}</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="{{ template_data.footer_link_2_1_href }}" class="hover:text-white transition" data-meta="footer_link_2_1_href footer_link_2_1_text">{{ template_data.footer_link_2_1_text }}</a></li>
+                            <li><a href="{{ template_data.footer_link_2_2_href }}" class="hover:text-white transition" data-meta="footer_link_2_2_href footer_link_2_2_text">{{ template_data.footer_link_2_2_text }}</a></li>
+                            <li><a href="{{ template_data.footer_link_2_3_href }}" class="hover:text-white transition" data-meta="footer_link_2_3_href footer_link_2_3_text">{{ template_data.footer_link_2_3_text }}</a></li>
+                            <li><a href="{{ template_data.footer_link_2_4_href }}" class="hover:text-white transition" data-meta="footer_link_2_4_href footer_link_2_4_text">{{ template_data.footer_link_2_4_text }}</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-white font-semibold mb-4" data-meta="footer_column_3_title">{{ template_data.footer_column_3_title }}</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#" id="privacy-link" class="hover:text-white transition" data-meta="footer_privacy_text">{{ template_data.footer_privacy_text }}</a></li>
+                            <li><a href="#" id="terms-link" class="hover:text-white transition" data-meta="footer_terms_text">{{ template_data.footer_terms_text }}</a></li>
+                            <li><a href="#" id="disclaimer-link" class="hover:text-white transition" data-meta="footer_disclaimer_text">{{ template_data.footer_disclaimer_text }}</a></li>
+                            <li><a href="#" id="about-link" class="hover:text-white transition" data-meta="footer_about_text">{{ template_data.footer_about_text }}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-sm mb-4 md:mb-0" data-meta="footer_copyright">
+                        {{ template_data.footer_copyright }}
+                    </p>
+                    <div class="flex space-x-6">
+                        <i class="fab fa-facebook text-gray-500 hover:text-white transition cursor-pointer"></i>
+                        <i class="fab fa-twitter text-gray-500 hover:text-white transition cursor-pointer"></i>
+                        <i class="fab fa-linkedin text-gray-500 hover:text-white transition cursor-pointer"></i>
+                        <i class="fab fa-youtube text-gray-500 hover:text-white transition cursor-pointer"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <div id="privacy-popup" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl max-w-2xl mx-4 max-h-[80vh] overflow-y-auto p-8 relative">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600" onclick="closePopup('privacy-popup')">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-4" data-meta="privacy_popup_title">{{ template_data.privacy_popup_title }}</h3>
+            <p class="text-gray-600 mb-4" data-meta="privacy_popup_intro">
+                {{ template_data.privacy_popup_intro }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="privacy_section_1_title">{{ template_data.privacy_section_1_title }}</h4>
+            <p class="text-gray-600 mb-4" data-meta="privacy_section_1_text">
+                {{ template_data.privacy_section_1_text }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="privacy_section_2_title">{{ template_data.privacy_section_2_title }}</h4>
+            <p class="text-gray-600 mb-4" data-meta="privacy_section_2_text">
+                {{ template_data.privacy_section_2_text }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="privacy_section_3_title">{{ template_data.privacy_section_3_title }}</h4>
+            <p class="text-gray-600" data-meta="privacy_section_3_text">
+                {{ template_data.privacy_section_3_text }}
+            </p>
+        </div>
+    </div>
+    
+    <div id="terms-popup" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl max-w-2xl mx-4 max-h-[80vh] overflow-y-auto p-8 relative">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600" onclick="closePopup('terms-popup')">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-4" data-meta="terms_popup_title">{{ template_data.terms_popup_title }}</h3>
+            <p class="text-gray-600 mb-4" data-meta="terms_popup_intro">
+                {{ template_data.terms_popup_intro }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="terms_section_1_title">{{ template_data.terms_section_1_title }}</h4>
+            <p class="text-gray-600 mb-4" data-meta="terms_section_1_text">
+                {{ template_data.terms_section_1_text }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="terms_section_2_title">{{ template_data.terms_section_2_title }}</h4>
+            <p class="text-gray-600 mb-4" data-meta="terms_section_2_text">
+                {{ template_data.terms_section_2_text }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="terms_section_3_title">{{ template_data.terms_section_3_title }}</h4>
+            <p class="text-gray-600" data-meta="terms_section_3_text">
+                {{ template_data.terms_section_3_text }}
+            </p>
+        </div>
+    </div>
+    
+    <div id="disclaimer-popup" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl max-w-2xl mx-4 max-h-[80vh] overflow-y-auto p-8 relative">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600" onclick="closePopup('disclaimer-popup')">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-4" data-meta="disclaimer_popup_title">{{ template_data.disclaimer_popup_title }}</h3>
+            <p class="text-gray-600 mb-4" data-meta="disclaimer_popup_intro">
+                {{ template_data.disclaimer_popup_intro }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="disclaimer_section_1_title">{{ template_data.disclaimer_section_1_title }}</h4>
+            <p class="text-gray-600 mb-4" data-meta="disclaimer_section_1_text">
+                {{ template_data.disclaimer_section_1_text }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="disclaimer_section_2_title">{{ template_data.disclaimer_section_2_title }}</h4>
+            <p class="text-gray-600" data-meta="disclaimer_section_2_text">
+                {{ template_data.disclaimer_section_2_text }}
+            </p>
+        </div>
+    </div>
+    
+    <div id="about-popup" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl max-w-2xl mx-4 max-h-[80vh] overflow-y-auto p-8 relative">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600" onclick="closePopup('about-popup')">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-4" data-meta="about_popup_title">{{ template_data.about_popup_title }}</h3>
+            <p class="text-gray-600 mb-4" data-meta="about_popup_intro">
+                {{ template_data.about_popup_intro }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="about_section_1_title">{{ template_data.about_section_1_title }}</h4>
+            <p class="text-gray-600 mb-4" data-meta="about_section_1_text">
+                {{ template_data.about_section_1_text }}
+            </p>
+            <h4 class="font-semibold mb-2" data-meta="about_section_2_title">{{ template_data.about_section_2_title }}</h4>
+            <p class="text-gray-600 mb-4" data-meta="about_section_2_text">
+                {{ template_data.about_section_2_text }}
+            </p>
+            <p class="text-gray-600" data-meta="about_footer_text">
+                {{ template_data.about_footer_text }}
+            </p>
+        </div>
+    </div>
+    
+    <div id="sticky-cta" class="fixed bottom-6 right-6 z-40 hidden">
+        <a href="{{ template_data.sticky_cta_link }}" class="cta-primary px-6 py-3 rounded-full shadow-2xl flex items-center space-x-2 relative overflow-hidden" data-meta="sticky_cta_link sticky_cta_text">
+            <span class="font-semibold" data-meta="sticky_cta_text_only">{{ template_data.sticky_cta_text }}</span>
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    
+    <div id="notification-1" class="minimal-notification">
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-400"></i>
+            <div>
+                <p class="font-semibold" data-meta="notification_1_name">{{ template_data.notification_1_name }}</p>
+                <p class="text-sm text-gray-400" data-meta="notification_1_action">{{ template_data.notification_1_action }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification-2" class="minimal-notification">
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-shopping-bag text-amber-400"></i>
+            <div>
+                <p class="font-semibold" data-meta="notification_2_name">{{ template_data.notification_2_name }}</p>
+                <p class="text-sm text-gray-400" data-meta="notification_2_action">{{ template_data.notification_2_action }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="exit-popup" class="minimal-popup">
+        <div class="bg-white rounded-xl p-8 max-w-md mx-4 relative">
+            <button id="close-popup" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div id="popup-step-1" class="text-center">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-{{ template_data.gift}} text-amber-500 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2" data-meta="exit_popup_title">{{ template_data.exit_popup_title }}</h3>
+                <p class="text-gray-600 mb-6" data-meta="exit_popup_subtitle">{{ template_data.exit_popup_subtitle }}</p>
+                <button id="claim-discount" class="w-full cta-primary py-3 rounded font-semibold relative overflow-hidden" data-meta="exit_popup_button">
+                    {{ template_data.exit_popup_button }}
+                </button>
+            </div>
+            
+            <div id="popup-step-2" class="hidden">
+                <h3 class="text-2xl font-bold mb-4 text-center" data-meta="exit_popup_email_title">{{ template_data.exit_popup_email_title }}</h3>
+                <input type="email" id="discount-email" placeholder="{{ template_data.exit_popup_email_placeholder }}" 
+                       class="w-full px-4 py-3 border rounded-lg mb-4 focus:border-emerald-500 focus:outline-none" data-meta="exit_popup_email_placeholder">
+                <button id="get-code" class="w-full cta-primary py-3 rounded font-semibold relative overflow-hidden" data-meta="exit_popup_get_code">
+                    {{ template_data.exit_popup_get_code }}
+                </button>
+            </div>
+            
+            <div id="popup-step-3" class="hidden text-center">
+                <i class="fas fa-{{ template_data.check_icon}}-circle text-emerald-500 text-5xl mb-4"></i>
+                <h3 class="text-2xl font-bold mb-4" data-meta="exit_popup_success_title">{{ template_data.exit_popup_success_title }}</h3>
+                <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                    <p class="text-3xl font-bold" id="discount-code" data-meta="exit_popup_discount_code">{{ template_data.exit_popup_discount_code }}</p>
+                    <p class="text-base text-gray-600 mt-1" data-meta="exit_popup_discount_text">{{ template_data.exit_popup_discount_text }}</p>
+                </div>
+                <button id="copy-code" class="w-full cta-primary py-3 rounded font-semibold relative overflow-hidden" data-meta="exit_popup_copy_button">
+                    {{ template_data.exit_popup_copy_button }}
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentGalleryImage = 0;
+        const galleryImages = document.querySelectorAll('.gallery-image');
+        const galleryDots = document.querySelectorAll('.gallery-dot');
+        
+        function updateGallery(index) {
+            galleryImages.forEach(img => img.classList.add('hidden'));
+            galleryImages[index].classList.remove('hidden');
+            
+            galleryDots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.remove('bg-white/50');
+                    dot.classList.add('bg-white');
+                } else {
+                    dot.classList.remove('bg-white');
+                    dot.classList.add('bg-white/50');
+                }
+            });
+            
+            currentGalleryImage = index;
+        }
+        
+        document.getElementById('gallery-prev').addEventListener('click', () => {
+            const newIndex = currentGalleryImage === 0 ? galleryImages.length - 1 : currentGalleryImage - 1;
+            updateGallery(newIndex);
+        });
+        
+        document.getElementById('gallery-next').addEventListener('click', () => {
+            const newIndex = currentGalleryImage === galleryImages.length - 1 ? 0 : currentGalleryImage + 1;
+            updateGallery(newIndex);
+        });
+        
+        galleryDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => updateGallery(index));
+        });
+        
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const galleryContainer = document.getElementById('gallery-container');
+        
+        galleryContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        galleryContainer.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                const newIndex = currentGalleryImage === galleryImages.length - 1 ? 0 : currentGalleryImage + 1;
+                updateGallery(newIndex);
+            }
+            if (touchEndX > touchStartX + 50) {
+                const newIndex = currentGalleryImage === 0 ? galleryImages.length - 1 : currentGalleryImage - 1;
+                updateGallery(newIndex);
+            }
+        }
+        
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+        
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('reading-progress').style.width = scrolled + '%';
+            
+            if (scrolled > 30) {
+                document.getElementById('sticky-cta').classList.remove('hidden');
+            } else {
+                document.getElementById('sticky-cta').classList.add('hidden');
+            }
+        });
+        
+        document.querySelectorAll('a[href^="#offer"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        function showNotification(id) {
+            const notification = document.getElementById(id);
+            setTimeout(() => {
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 4000);
+            }, Math.random() * 5000 + 8000);
+        }
+        
+        showNotification('notification-1');
+        setTimeout(() => showNotification('notification-2'), 15000);
+        
+        setInterval(() => {
+            showNotification('notification-1');
+            setTimeout(() => showNotification('notification-2'), 15000);
+        }, 35000);
+        
+        let exitShown = false;
+        document.addEventListener('mouseout', function(e) {
+            if (e.clientY <= 0 && !exitShown) {
+                document.getElementById('exit-popup').classList.add('active');
+                exitShown = true;
+            }
+        });
+        
+        document.getElementById('close-popup').addEventListener('click', function() {
+            document.getElementById('exit-popup').classList.remove('active');
+        });
+        
+        document.getElementById('claim-discount').addEventListener('click', function() {
+            document.getElementById('popup-step-1').classList.add('hidden');
+            document.getElementById('popup-step-2').classList.remove('hidden');
+        });
+        
+        document.getElementById('get-code').addEventListener('click', function() {
+            const email = document.getElementById('discount-email').value;
+            if (email && email.includes('@')) {
+                document.getElementById('popup-step-2').classList.add('hidden');
+                document.getElementById('popup-step-3').classList.remove('hidden');
+            }
+        });
+        
+        document.getElementById('copy-code').addEventListener('click', function() {
+            const code = document.getElementById('discount-code').textContent;
+            navigator.clipboard.writeText(code);
+            this.innerHTML = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('exit-popup').classList.remove('active');
+            }, 1500);
+        });
+        document.querySelectorAll('.faq-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('i');
+                
+                content.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            });
+        });
+        
+        function openPopup(popupId) {
+            document.getElementById(popupId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        document.getElementById('privacy-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            openPopup('privacy-popup');
+        });
+        
+        document.getElementById('terms-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            openPopup('terms-popup');
+        });
+        
+        document.getElementById('disclaimer-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            openPopup('disclaimer-popup');
+        });
+        
+        document.getElementById('about-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            openPopup('about-popup');
+        });
+        
+        document.querySelectorAll('#privacy-popup, #terms-popup, #disclaimer-popup, #about-popup').forEach(popup => {
+            popup.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

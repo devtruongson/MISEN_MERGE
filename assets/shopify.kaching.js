@@ -207,7 +207,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
         const handleClick = async (lineItems) => {
             const lines = [];
             
-            onsole.log("check dealBar", dealBar);
+            console.log("check dealBar", dealBar);
             return;
             variantActives.forEach((variantId, index) => {
                 if (!variantId) return;

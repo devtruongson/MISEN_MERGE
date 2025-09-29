@@ -247,6 +247,24 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                 });
             }
 
+            await fetch(`https://${Shopify.shop}/cart.js`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    items: lines.map(line => ({
+                        quantity: line.quantity,
+                        id: line.merchandiseId.split("/").pop(),
+                        properties: line.attributes.reduce((acc, attr) => {
+                            acc[attr.key] = attr.value;
+                            return acc;
+                        }, {})
+                    }))
+                })
+            })
+            return;
+
             return await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
                 method: "POST",
                 headers: {

@@ -219,7 +219,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                             {
                                 key: "__kaching_bundles",
                                 value: JSON.stringify({
-                                    id:  dealBar.id
+                                    id:  dealBar.id,
                                     deal: dealBar.nanoId,
                                     main: true,
                                 })

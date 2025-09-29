@@ -263,10 +263,10 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                     }))
                 })
             })
-            window.location.href = "/checkout";
+            // window.location.href = "/checkout";
         }
 
-        // addToCartButton.addEventListener("click", handleClick);
+        addToCartButton.addEventListener("click", handleClick);
 
         return () => {
             addToCartButton.removeEventListener("click", handleClick);

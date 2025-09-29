@@ -203,10 +203,9 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
         }
 
         if (variantActives.length === 0) return;
-
         const handleClick = async (lineItems) => {
             const lines = [];
-            
+
             variantActives.forEach((variantId, index) => {
                 if (!variantId) return;
                 const existing = lines.find(line => line.merchandiseId === `gid://shopify/ProductVariant/${variantId}`);
@@ -252,7 +251,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                 });
             }
 
-            await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
+            return await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

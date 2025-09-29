@@ -317,7 +317,8 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
 
     return (
         <>
-            <div className="flex justify-between items-center mb-2">
+        [...Array(countOffer)].map((_, index) => {
+            return <div className="flex justify-between items-center mb-2">
                 {productData.options.map((option, optionIndex) => {
                     if (option.values.length <= 1) {
                         return null;
@@ -368,6 +369,8 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
                     );
                 })}
             </div>
+        })
+            
         </>
     );
 }

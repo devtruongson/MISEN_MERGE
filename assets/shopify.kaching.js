@@ -202,6 +202,8 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
 
         const handleClick = async (lineItems) => {
             const lines = [];
+            
+            console.log("variantActives: ", variantActives)
 
             // Add main product lines for each row
             variantActives.forEach((variantId, index) => {
@@ -215,7 +217,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                                 value: JSON.stringify({
                                     deal: dealBar.id,
                                     main: true,
-                                    rowIndex: index // Track which row this variant belongs to
+                                    rowIndex: index     
                                 })
                             }
                         ]

@@ -255,22 +255,46 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
             }
 
             await fetch(`/cart/add.js`, {
+            return await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "X-Shopify-Storefront-Access-Token": "07e41e6b62b1dad042bc9872ebfbaca5"
                 },
                 body: JSON.stringify({
-                    items: lines.map(line => ({
-                        quantity: line.quantity,
-                        id: line.merchandiseId.split("/").pop(),
-                        properties: line.attributes.reduce((acc, attr) => {
-                            acc[attr.key] = attr.value;
-                            return acc;
-                        }, {})
-                    }))
+                    query: `mutation cartCreate($input: CartInput) {
+                        cartCreate(input: $input) { 
+                            cart { 
+                                id 
+                                checkoutUrl
+                                attributes {
+                                    key
+                                    value
+                                }
+                            }
+                            userErrors { 
+                                field 
+                                message 
+                                } 
+                            } 
+                        }`,
+                    variables: {
+                        input: {
+                            lines: lines,
+                        }
+                    }
                 })
             })
-            // window.location.href = "/checkout";
+                .then((res) => res.json())
+                .then(({ data }) => {
+                    if (data.cartCreate && data.cartCreate.cart) {
+                        window.location.href = data.cartCreate.cart.checkoutUrl;
+                        return;
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                });
         }
 
         addToCartButton.addEventListener("click", handleClick);

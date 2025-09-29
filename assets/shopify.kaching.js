@@ -104,6 +104,7 @@ function formatNumberTruncate(number, precision) {
 
 function DealBars(dealBars) {
     const listProductRoot = document.querySelectorAll(".root-product-render");
+    console.log(listProductRoot)
     if (!listProductRoot || listProductRoot.length === 0) return;
     listProductRoot.forEach((productRoot, index) => {
         HandleDealBarItem(productRoot, index, dealBars)
@@ -134,6 +135,7 @@ function HandleDealBarItem(productRoot, index, dealBars) {
     const savePriceText = document.querySelector(".save-price-text");
     const todayPrice = document.querySelector(".today-price");
     const imageRender = productRoot.querySelector("img");
+    console.log(priceDiscount)
 
     if (!priceOriginal || !priceDiscount || !priceDiscountText || !addToCartButton || !priceDiscountTextWp || !variantSelectWrapper || !imageRender) return;
     const dealBar = dealBars[index];

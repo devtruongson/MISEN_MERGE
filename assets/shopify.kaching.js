@@ -104,7 +104,6 @@ function formatNumberTruncate(number, precision) {
 
 function DealBars(dealBars) {
     const listProductRoot = document.querySelectorAll(".root-product-render");
-    console.log(listProductRoot)
     if (!listProductRoot || listProductRoot.length === 0) return;
     listProductRoot.forEach((productRoot, index) => {
         HandleDealBarItem(productRoot, index, dealBars)

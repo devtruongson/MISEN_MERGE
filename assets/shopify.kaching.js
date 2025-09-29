@@ -335,7 +335,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
                     <div key={optionIndex} className="relative w-[48%]">
                         <button
                             onClick={() => toggleDropdown(optionIndex)}
-                            className={`w-full flex items-center justify-between px-4 py-3 bg-white border-[2px] rounded-xl text-left hover:bg-slate-100 transition-colors ${isOpen ? 'border-slate-800' : ' border-slate-200'}`}
+                            className={`w-full whitespace-nowrap flex items-center justify-between p-2 bg-white border-[2px] rounded-xl text-left hover:bg-slate-100 transition-colors ${isOpen ? 'border-slate-800' : ' border-slate-200'}`}
                         >
                             <div className="flex items-center gap-3">
                                 <span className="text-black font-medium text-sm">

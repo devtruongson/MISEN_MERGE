@@ -143,13 +143,13 @@ function HandleDealBarItem(productRoot, index, dealBars) {
     const handleShowPrice = (price) => {
         if (dealBar.discountType !== "default") {
             priceOriginal.textContent = formatMoney(price * dealBar.quantity);
-            if(regularPrice) {
+            if (regularPrice) {
                 regularPrice.textContent = formatMoney(price * dealBar.quantity);
             }
-            if(savePriceText) {
+            if (savePriceText) {
                 savePriceText.textContent = `Save ${formatMoney(price * dealBar.quantity - handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity)} (${dealBar.discountValue}%)`;
             }
-            if(todayPrice) {
+            if (todayPrice) {
                 todayPrice.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
             }
             priceDiscount.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
@@ -171,9 +171,9 @@ function HandleVariantSelect(variantSelectWrapper, imageRender, handleShowPrice,
     variantSelect.render(<VariantSelect imageRender={imageRender} handleShowPrice={handleShowPrice} addToCartButton={addToCartButton} dealBar={dealBar} countOffer={index + 1} />);
 }
 
-function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar , countOffer}) {
+function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar, countOffer }) {
     const [variantActive, setVariantActive] = React.useState(null);
-    const [openDropdown, setOpenDropdown] = React.useState(null); // Changed to single value
+    const [openDropdown, setOpenDropdown] = React.useState(null); // Format: "rowIndex-optionIndex"
 
     React.useEffect(() => {
         setVariantActive(productData?.selected_or_first_available_variant?.id);
@@ -281,8 +281,9 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
         };
     }, [variantActive, productData, dealBar]);
 
-    const toggleDropdown = (optionIndex) => {
-        setOpenDropdown(prev => prev === optionIndex ? null : optionIndex);
+    const toggleDropdown = (rowIndex, optionIndex) => {
+        const dropdownId = `${rowIndex}-${optionIndex}`;
+        setOpenDropdown(prev => prev === dropdownId ? null : dropdownId);
     };
 
     const handleOptionSelect = (optionIndex, selectedValue) => {
@@ -315,64 +316,69 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
         return null;
     }
 
+    // Filter options that have more than 1 value
+    const validOptions = productData.options.filter(option => option.values.length > 1);
+
+    if (validOptions.length === 0) {
+        return null;
+    }
+
     return (
         <>
-        {
-            [...Array(countOffer)].map((_, index) => {
-                return <div className="flex justify-between items-center mb-2">
-                    {productData.options.map((option, optionIndex) => {
-                        if (option.values.length <= 1) {
-                            return null;
-                        }
+            {[...Array(countOffer)].map((_, rowIndex) => {
+                return (
+                    <div key={rowIndex} className="flex justify-between items-center mb-2">
+                        {validOptions.map((option, validOptionIndex) => {
+                            // Find original option index for getCurrentOptionValue
+                            const originalOptionIndex = productData.options.findIndex(opt => opt.name === option.name);
+                            const dropdownId = `${rowIndex}-${validOptionIndex}`;
+                            const isOpen = openDropdown === dropdownId;
 
-                        const isOpen = openDropdown === optionIndex;
-
-                        return (
-                            <div key={optionIndex} className="relative w-[48%]">
-                                <button
-                                    onClick={() => toggleDropdown(optionIndex)}
-                                    className={`w-full whitespace-nowrap flex items-center justify-between p-2 bg-white border-[2px] rounded-xl text-left hover:bg-slate-100 transition-colors ${isOpen ? 'border-slate-800' : ' border-slate-200'}`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-black font-medium text-sm">
-                                            {getCurrentOptionValue(optionIndex)}
-                                        </span>
-                                    </div>
-                                    <svg
-                                        className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
+                            return (
+                                <div key={`${rowIndex}-${validOptionIndex}`} className="relative w-[48%]">
+                                    <button
+                                        onClick={() => toggleDropdown(rowIndex, validOptionIndex)}
+                                        className={`w-full whitespace-nowrap flex items-center justify-between p-2 bg-white border-[2px] rounded-xl text-left hover:bg-slate-100 transition-colors ${isOpen ? 'border-slate-800' : ' border-slate-200'}`}
                                     >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-black font-medium text-sm">
+                                                {getCurrentOptionValue(originalOptionIndex)}
+                                            </span>
+                                        </div>
+                                        <svg
+                                            className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
 
-                                {isOpen && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-xl shadow-xl z-10 animate-slide-down">
-                                        {option.values.map((value, valueIndex) => (
-                                            <button
-                                                key={valueIndex}
-                                                onClick={() => handleOptionSelect(optionIndex, value)}
-                                                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors"
-                                            >
-                                                <span className="text-black">{value}</span>
-                                                {getCurrentOptionValue(optionIndex) === value && (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-500 ml-auto" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                        <path d="M20 6 9 17l-5-5"></path>
-                                                    </svg>
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-            })
-        }
-            
+                                    {isOpen && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-xl shadow-xl z-10 animate-slide-down">
+                                            {option.values.map((value, valueIndex) => (
+                                                <button
+                                                    key={valueIndex}
+                                                    onClick={() => handleOptionSelect(originalOptionIndex, value)}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors"
+                                                >
+                                                    <span className="text-black">{value}</span>
+                                                    {getCurrentOptionValue(originalOptionIndex) === value && (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-500 ml-auto" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M20 6 9 17l-5-5"></path>
+                                                        </svg>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                );
+            })}
         </>
     );
 }

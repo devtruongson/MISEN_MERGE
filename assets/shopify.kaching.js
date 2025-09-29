@@ -135,7 +135,7 @@ function HandleDealBarItem(productRoot, index, dealBars) {
     const savePriceText = document.querySelector(".save-price-text");
     const todayPrice = document.querySelector(".today-price");
     const imageRender = productRoot.querySelector("img");
-    console.log(priceDiscount)
+    return;
 
     if (!priceOriginal || !priceDiscount || !priceDiscountText || !addToCartButton || !priceDiscountTextWp || !variantSelectWrapper || !imageRender) return;
     const dealBar = dealBars[index];

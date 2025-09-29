@@ -282,20 +282,16 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
     }, [variantActive, productData, dealBar]);
 
     const toggleDropdown = (optionIndex) => {
-        // If clicking the same dropdown, close it. Otherwise, open the new one
         setOpenDropdown(prev => prev === optionIndex ? null : optionIndex);
     };
 
     const handleOptionSelect = (optionIndex, selectedValue) => {
-        // Get current variant's options
         const currentVariant = productData.variants.find(variant => variant.id === variantActive);
         const currentOptions = currentVariant?.title?.split(" / ") || [];
 
-        // Update the specific option
         const newOptions = [...currentOptions];
         newOptions[optionIndex] = selectedValue;
 
-        // Find variant that matches the new option combination
         const newVariant = productData.variants.find(variant => {
             const variantOptions = variant.title.split(" / ");
             return newOptions.every((option, idx) => variantOptions[idx] === option);
@@ -305,7 +301,6 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
             setVariantActive(newVariant.id);
         }
 
-        // Close dropdown after selection
         setOpenDropdown(null);
     };
 
@@ -314,7 +309,6 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
         return currentVariant?.title?.split(" / ")[optionIndex] || '';
     };
 
-    // Only show options if there are multiple variants and options have more than 1 value
     const shouldShowOptions = productData.options.length > 0;
 
     if (!shouldShowOptions) {
@@ -324,7 +318,6 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
     return (
         <div className="flex justify-between items-center mb-2">
             {productData.options.map((option, optionIndex) => {
-                // Skip option if it only has 1 value
                 if (option.values.length <= 1) {
                     return null;
                 }

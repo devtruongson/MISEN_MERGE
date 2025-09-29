@@ -247,7 +247,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                 });
             }
 
-            await fetch(`/cart.js`, {
+            await fetch(`/cart/add.js`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

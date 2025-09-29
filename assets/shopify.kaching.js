@@ -203,11 +203,12 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
         const handleClick = async (lineItems) => {
             const lines = [];
             
-            console.log("variantActives: ", variantActives)
-
-            // Add main product lines for each row
             variantActives.forEach((variantId, index) => {
-                if (variantId) {
+                if (!variantId) return;
+                const existing = lines.find(line => line.merchandiseId === `gid://shopify/ProductVariant/${variantId}`);
+                if (existing) {
+                    existing.quantity += 1;
+                } else {
                     lines.push({
                         quantity: 1,
                         merchandiseId: `gid://shopify/ProductVariant/${variantId}`,

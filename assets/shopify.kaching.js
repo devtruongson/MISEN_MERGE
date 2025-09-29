@@ -332,7 +332,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
                 const isOpen = openDropdown === optionIndex;
 
                 return (
-                    <div key={optionIndex} className="relative">
+                    <div key={optionIndex} className="relative w-[48%]">
                         <button
                             onClick={() => toggleDropdown(optionIndex)}
                             className={`w-full flex items-center justify-between px-4 py-3 bg-white border-[2px] rounded-xl text-left hover:bg-slate-100 transition-colors ${isOpen ? 'border-slate-800' : ' border-slate-200'}`}

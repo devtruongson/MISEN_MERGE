@@ -172,45 +172,58 @@ function HandleVariantSelect(variantSelectWrapper, imageRender, handleShowPrice,
 }
 
 function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar, countOffer }) {
-    const [variantActive, setVariantActive] = React.useState(null);
-    const [openDropdown, setOpenDropdown] = React.useState(null); // Format: "rowIndex-optionIndex"
+    // Array of variant states, one for each row
+    const [variantActives, setVariantActives] = React.useState([]);
+    const [openDropdown, setOpenDropdown] = React.useState(null);
 
     React.useEffect(() => {
-        setVariantActive(productData?.selected_or_first_available_variant?.id);
-    }, [productData]);
+        // Initialize all rows with the same default variant
+        const defaultVariantId = productData?.selected_or_first_available_variant?.id;
+        const initialVariants = Array(countOffer).fill(defaultVariantId);
+        setVariantActives(initialVariants);
+    }, [productData, countOffer]);
 
     React.useEffect(() => {
-        if (variantActive) {
+        // Update image and price based on first row's variant
+        const firstVariant = variantActives[0];
+        if (firstVariant) {
             imageRender.src =
-                productData?.variants?.find((variant) => variant.id == variantActive)?.image ||
+                productData?.variants?.find((variant) => variant.id == firstVariant)?.image ||
                 productData.image;
             handleShowPrice(
-                productData?.variants?.find((variant) => variant.id == variantActive)?.price ||
+                productData?.variants?.find((variant) => variant.id == firstVariant)?.price ||
                 productData.price
             );
         } else {
             handleShowPrice(productData.price);
         }
 
-        if (!variantActive) return;
+        if (variantActives.length === 0) return;
 
         const handleClick = async (lineItems) => {
-            const lines = [
-                {
-                    quantity: dealBar.quantity,
-                    merchandiseId: `gid://shopify/ProductVariant/${variantActive}`,
-                    attributes: [
-                        {
-                            key: "__kaching_bundles",
-                            value: JSON.stringify({
-                                deal: dealBar.id,
-                                main: true
-                            })
-                        }
-                    ]
-                }
-            ];
+            const lines = [];
 
+            // Add main product lines for each row
+            variantActives.forEach((variantId, index) => {
+                if (variantId) {
+                    lines.push({
+                        quantity: dealBar.quantity,
+                        merchandiseId: `gid://shopify/ProductVariant/${variantId}`,
+                        attributes: [
+                            {
+                                key: "__kaching_bundles",
+                                value: JSON.stringify({
+                                    deal: dealBar.id,
+                                    main: true,
+                                    rowIndex: index // Track which row this variant belongs to
+                                })
+                            }
+                        ]
+                    });
+                }
+            });
+
+            // Add free gifts if any
             if (dealBar.freeGifts && dealBar.freeGifts.length > 0) {
                 dealBar.freeGifts.forEach(gift => {
                     if (gift.variantGID) {
@@ -279,34 +292,44 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
         return () => {
             addToCartButton.removeEventListener("click", handleClick);
         };
-    }, [variantActive, productData, dealBar]);
+    }, [variantActives, productData, dealBar]);
 
     const toggleDropdown = (rowIndex, optionIndex) => {
         const dropdownId = `${rowIndex}-${optionIndex}`;
         setOpenDropdown(prev => prev === dropdownId ? null : dropdownId);
     };
 
-    const handleOptionSelect = (optionIndex, selectedValue) => {
-        const currentVariant = productData.variants.find(variant => variant.id === variantActive);
+    const handleOptionSelect = (rowIndex, optionIndex, selectedValue) => {
+        // Get current variant for this specific row
+        const currentVariantId = variantActives[rowIndex];
+        const currentVariant = productData.variants.find(variant => variant.id === currentVariantId);
         const currentOptions = currentVariant?.title?.split(" / ") || [];
 
+        // Update the specific option
         const newOptions = [...currentOptions];
         newOptions[optionIndex] = selectedValue;
 
+        // Find variant that matches the new option combination
         const newVariant = productData.variants.find(variant => {
             const variantOptions = variant.title.split(" / ");
             return newOptions.every((option, idx) => variantOptions[idx] === option);
         });
 
         if (newVariant) {
-            setVariantActive(newVariant.id);
+            // Update only the specific row's variant
+            setVariantActives(prev => {
+                const newVariants = [...prev];
+                newVariants[rowIndex] = newVariant.id;
+                return newVariants;
+            });
         }
 
         setOpenDropdown(null);
     };
 
-    const getCurrentOptionValue = (optionIndex) => {
-        const currentVariant = productData.variants.find(variant => variant.id === variantActive);
+    const getCurrentOptionValue = (rowIndex, optionIndex) => {
+        const currentVariantId = variantActives[rowIndex];
+        const currentVariant = productData.variants.find(variant => variant.id === currentVariantId);
         return currentVariant?.title?.split(" / ")[optionIndex] || '';
     };
 
@@ -342,7 +365,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                                     >
                                         <div className="flex items-center gap-3">
                                             <span className="text-black font-medium text-sm">
-                                                {getCurrentOptionValue(originalOptionIndex)}
+                                                {getCurrentOptionValue(rowIndex, originalOptionIndex)}
                                             </span>
                                         </div>
                                         <svg
@@ -360,11 +383,11 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                                             {option.values.map((value, valueIndex) => (
                                                 <button
                                                     key={valueIndex}
-                                                    onClick={() => handleOptionSelect(originalOptionIndex, value)}
+                                                    onClick={() => handleOptionSelect(rowIndex, originalOptionIndex, value)}
                                                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors"
                                                 >
                                                     <span className="text-black">{value}</span>
-                                                    {getCurrentOptionValue(originalOptionIndex) === value && (
+                                                    {getCurrentOptionValue(rowIndex, originalOptionIndex) === value && (
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-green-500 ml-auto" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                             <path d="M20 6 9 17l-5-5"></path>
                                                         </svg>

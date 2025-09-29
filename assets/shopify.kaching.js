@@ -390,7 +390,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                                                 <button
                                                     key={valueIndex}
                                                     onClick={() => handleOptionSelect(rowIndex, originalOptionIndex, value)}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors"
+                                                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl transition-colors text-sm"
                                                 >
                                                     <span className="text-black">{value}</span>
                                                     {getCurrentOptionValue(rowIndex, originalOptionIndex) === value && (

@@ -149,6 +149,7 @@ function HandleDealBarItem(productRoot, index, dealBars) {
             priceDiscount.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
             priceDiscountText.textContent = `Save ${formatMoney(price * dealBar.quantity - handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity)} (${dealBar.discountValue}%)`;
         } else {
+            console.log(12)
             priceDiscountTextWp.style.display = "none";
             priceOriginal.style.display = "none";
             priceDiscount.textContent = formatMoney(price * dealBar.quantity);
@@ -178,8 +179,6 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
             imageRender.src =
                 productData?.variants?.find((variant) => variant.id == variantActive)?.image ||
                 productData.image;
-            console.log(123)
-
             handleShowPrice(
                 productData?.variants?.find((variant) => variant.id == variantActive)?.price ||
                 productData.price

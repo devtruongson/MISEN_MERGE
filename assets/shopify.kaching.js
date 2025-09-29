@@ -209,7 +209,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
             variantActives.forEach((variantId, index) => {
                 if (variantId) {
                     lines.push({
-                        quantity: dealBar.quantity,
+                        quantity: 1,
                         merchandiseId: `gid://shopify/ProductVariant/${variantId}`,
                         attributes: [
                             {

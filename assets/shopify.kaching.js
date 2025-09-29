@@ -28,7 +28,12 @@ setTimeout(() => {
         const dealBars = configJson.dealBars;
         if (!dealBars || dealBars.length === 0) return;
         katChingBundlePar.style.display = "none";
-        DealBars(dealBars);
+        DealBars(dealBars.map(item => {
+            return {
+                ...item,
+                nanoId: configJson.nanoId
+            }
+        }));
     }
 }, 2000);
 

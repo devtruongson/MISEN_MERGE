@@ -375,7 +375,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                                             </span>
                                         </div>
                                         <svg
-                                            className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                                            className={`w-3 h-3 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"

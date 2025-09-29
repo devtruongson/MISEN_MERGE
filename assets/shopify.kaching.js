@@ -263,48 +263,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                     }))
                 })
             })
-            return;
-
-            return await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Shopify-Storefront-Access-Token": "07e41e6b62b1dad042bc9872ebfbaca5"
-                },
-                body: JSON.stringify({
-                    query: `mutation cartCreate($input: CartInput) {
-                        cartCreate(input: $input) { 
-                            cart { 
-                                id 
-                                checkoutUrl
-                                attributes {
-                                    key
-                                    value
-                                }
-                            }
-                            userErrors { 
-                                field 
-                                message 
-                                } 
-                            } 
-                        }`,
-                    variables: {
-                        input: {
-                            lines: lines,
-                        }
-                    }
-                })
-            })
-                .then((res) => res.json())
-                .then(({ data }) => {
-                    if (data.cartCreate && data.cartCreate.cart) {
-                        window.location.href = data.cartCreate.cart.checkoutUrl;
-                        return;
-                    }
-                })
-                .catch(error => {
-                    console.log(error)
-                });
+            window.location.href = "/checkout";
         }
 
         addToCartButton.addEventListener("click", handleClick);

@@ -135,7 +135,6 @@ function HandleDealBarItem(productRoot, index, dealBars) {
     const savePriceText = document.querySelector(".save-price-text");
     const todayPrice = document.querySelector(".today-price");
     const imageRender = productRoot.querySelector("img");
-    return;
 
     if (!priceOriginal || !priceDiscount || !priceDiscountText || !addToCartButton || !priceDiscountTextWp || !variantSelectWrapper || !imageRender) return;
     const dealBar = dealBars[index];
@@ -179,6 +178,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
             imageRender.src =
                 productData?.variants?.find((variant) => variant.id == variantActive)?.image ||
                 productData.image;
+            console.log(123)
 
             handleShowPrice(
                 productData?.variants?.find((variant) => variant.id == variantActive)?.price ||

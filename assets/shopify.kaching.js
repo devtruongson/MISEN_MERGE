@@ -247,7 +247,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                 });
             }
 
-            await fetch(`https://${Shopify.shop}/cart.js`, {
+            await fetch(`/cart.js`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

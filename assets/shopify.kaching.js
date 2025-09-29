@@ -322,7 +322,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar 
     }
 
     return (
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-2">
             {productData.options.map((option, optionIndex) => {
                 // Skip option if it only has 1 value
                 if (option.values.length <= 1) {

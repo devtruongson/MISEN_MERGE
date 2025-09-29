@@ -252,7 +252,7 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
                 });
             }
 
-            return await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
+            await fetch(`https://${Shopify.shop}/api/${"2025-07"}/graphql.json`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

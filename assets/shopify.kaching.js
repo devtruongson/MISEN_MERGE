@@ -27,8 +27,7 @@ setTimeout(() => {
         const configJson = JSON.parse(config);
         const dealBars = configJson.dealBars;
         if (!dealBars || dealBars.length === 0) return;
-        const propertiesKaching = document.querySelector('input[name="properties[__kaching_bundles]"]');
-        console.log("propertiesKaching: ", propertiesKaching);
+        console.log("check configJson: ", configJson)
 
         katChingBundlePar.style.display = "none";
         DealBars(dealBars);

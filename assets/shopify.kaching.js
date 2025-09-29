@@ -143,13 +143,18 @@ function HandleDealBarItem(productRoot, index, dealBars) {
     const handleShowPrice = (price) => {
         if (dealBar.discountType !== "default") {
             priceOriginal.textContent = formatMoney(price * dealBar.quantity);
-            regularPrice.textContent = formatMoney(price * dealBar.quantity);
-            todayPrice.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
-            savePriceText.textContent = `Save ${formatMoney(price * dealBar.quantity - handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity)} (${dealBar.discountValue}%)`;
+            if(regularPrice) {
+                regularPrice.textContent = formatMoney(price * dealBar.quantity);
+            }
+            if(savePriceText) {
+                savePriceText.textContent = `Save ${formatMoney(price * dealBar.quantity - handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity)} (${dealBar.discountValue}%)`;
+            }
+            if(todayPrice) {
+                todayPrice.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
+            }
             priceDiscount.textContent = formatMoney(handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity);
             priceDiscountText.textContent = `Save ${formatMoney(price * dealBar.quantity - handleCalcPrice(dealBar.discountValue, dealBar.discountType, price) * dealBar.quantity)} (${dealBar.discountValue}%)`;
         } else {
-            console.log(12)
             priceDiscountTextWp.style.display = "none";
             priceOriginal.style.display = "none";
             priceDiscount.textContent = formatMoney(price * dealBar.quantity);

@@ -199,14 +199,11 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
 
         if (variantActives.length === 0) return;
 
-
-      
-        
         const handleClick = async (lineItems) => {
             const lines = [];
             
-              console.log("check dealBar: ", dealBar)
-        return;
+            onsole.log("check dealBar", dealBar);
+            return;
             variantActives.forEach((variantId, index) => {
                 if (!variantId) return;
                 const existing = lines.find(line => line.merchandiseId === `gid://shopify/ProductVariant/${variantId}`);

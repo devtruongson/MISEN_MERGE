@@ -199,6 +199,10 @@ function VariantSelect({ imageRender, handleShowPrice, addToCartButton, dealBar,
 
         if (variantActives.length === 0) return;
 
+
+        console.log("check dealBar: ", dealBar)
+        return;
+        
         const handleClick = async (lineItems) => {
             const lines = [];
             

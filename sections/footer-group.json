@@ -1,1 +1,71 @@
-{"name":"t:sections.footer.name","type":"footer","sections":{"footer":{"type":"footer","blocks":{"link_list_6BikKU":{"type":"link_list","settings":{"heading":"Shop","menu":"footer"}},"link_list_yteekE":{"type":"link_list","settings":{"heading":"Policy","menu":"policy"}},"link_list_hQ8WPJ":{"type":"link_list","settings":{"heading":"Explore","menu":"footer-explore"}}},"block_order":["link_list_6BikKU","link_list_yteekE","link_list_hQ8WPJ"],"settings":{"color_scheme":"scheme-4","newsletter_enable":true,"newsletter_heading":"Subscribe to our emails","enable_follow_on_shop":true,"show_social":false,"enable_country_selector":true,"enable_language_selector":true,"payment_enable":true,"show_policy":true,"margin_top":0,"padding_top":36,"padding_bottom":36}}},"order":["footer"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "link_list_6BikKU": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Shop",
+            "menu": "footer"
+          }
+        },
+        "link_list_yteekE": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Policy",
+            "menu": "policy"
+          }
+        },
+        "link_list_hQ8WPJ": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Explore",
+            "menu": "footer-explore"
+          }
+        },
+        "text_gpmYxC": {
+          "type": "text",
+          "settings": {
+            "heading": "This website is operated by",
+            "subtext": "<p>UNITRADE DIGITAL PTE. LTD.<br/>Registered Address: 3 Coleman Street, #03-24, Peninsula Shopping Complex, Singapore (179804)<br/>CR No.: 202526538Z<br/></p>"
+          }
+        }
+      },
+      "block_order": [
+        "link_list_6BikKU",
+        "link_list_yteekE",
+        "link_list_hQ8WPJ",
+        "text_gpmYxC"
+      ],
+      "settings": {
+        "color_scheme": "scheme-4",
+        "newsletter_enable": true,
+        "newsletter_heading": "Subscribe to our emails",
+        "enable_follow_on_shop": true,
+        "show_social": false,
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "payment_enable": true,
+        "show_policy": true,
+        "margin_top": 0,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

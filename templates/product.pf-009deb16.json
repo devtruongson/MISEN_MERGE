@@ -111,5 +111,6 @@
     "main",
     "related-products",
     "pf-009deb16"
-  ]
+  ],
+  "layout": "theme.pagefly"
 }

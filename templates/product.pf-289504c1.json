@@ -111,5 +111,6 @@
     "main",
     "related-products",
     "pf-289504c1"
-  ]
+  ],
+  "layout": "theme.pagefly"
 }
